@@ -1,0 +1,12 @@
+webshare-styles:
+  css:
+    theme:
+      css/webshare.css: {}
+
+webshare-script:
+  js:
+    js/webshare.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/once

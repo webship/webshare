@@ -1,0 +1,5 @@
+webshare.config_form:
+  route_name: webshare.config_form
+  title: 'Webshare'
+  description: 'Choose social buttons to appear on your site.'
+  parent: system.admin_config_services

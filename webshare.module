@@ -1,0 +1,214 @@
+<?php
+
+/**
+ * @file
+ * A module that adds social buttons to your website.
+ */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function webshare_theme($existing, $type, $theme, $path) {
+  $template_vars = [
+    'url' => NULL,
+    'content' => NULL,
+  ];
+  $variables = [
+    'webshare' => [
+      'variables' => [
+        'attributes' => [
+          'class' => NULL,
+        ],
+        'title' => NULL,
+        'share_icon' => NULL,
+        'webshare_links_id' => NULL,
+        'is_active' => NULL,
+        'buttons' => NULL,
+      ],
+      'template' => 'webshare',
+    ],
+    'webshare_facebook_share' => [
+      'variables' => $template_vars,
+      'template' => 'webshare-facebook-share',
+    ],
+    'webshare_x' => [
+      'variables' => $template_vars,
+      'template' => 'webshare-x',
+    ],
+    'webshare_linkedin' => [
+      'variables' => $template_vars,
+      'template' => 'webshare-linkedin',
+    ],
+    'webshare_whatsapp' => [
+      'variables' => $template_vars,
+      'template' => 'webshare-whatsapp',
+    ],
+    'webshare_copy' => [
+      'variables' => $template_vars,
+      'template' => 'webshare-copy-url',
+    ],
+  ];
+  return $variables;
+}
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function webshare_entity_extra_field_info() {
+  $config = \Drupal::config('webshare.settings');
+  $extra = [];
+
+  if ($config->get('location') == 'content') {
+    $entity_info = \Drupal::service('entity_type.bundle.info')->getAllBundleInfo();
+
+    if (isset($entity_info['node'])) {
+      foreach ($entity_info['node'] as $bundle => $bundle_info) {
+        $extra['node'][$bundle]['display'] = [
+          'webshare' => [
+            'label' => t('Webshare'),
+            'description' => t('Webshare buttons'),
+            'weight' => $config->get('weight'),
+          ],
+        ];
+      }
+    }
+    if (isset($entity_info['commerce_product'])) {
+      foreach ($entity_info['commerce_product'] as $bundle => $bundle_info) {
+        $extra['commerce_product'][$bundle]['display'] = [
+          'webshare' => [
+            'label' => t('Webshare'),
+            'description' => t('Webshare buttons'),
+            'weight' => $config->get('weight'),
+          ],
+        ];
+      }
+    }
+  }
+  return $extra;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function webshare_node_view(array &$build, EntityInterface $node, EntityViewDisplayInterface $display, $view_mode) {
+  $config = \Drupal::config('webshare.settings');
+  $share_service = \Drupal::service('webshare.service');
+  $route_params = \Drupal::routeMatch()->getParameters();
+
+  if (($route_params->has('node_preview') && $route_params->get('node_preview')->in_preview) || $share_service->isRestricted($view_mode)) {
+    return;
+  }
+
+  $url = $node->toUrl()->setAbsolute()->toString();
+  $id = $node->getEntityTypeId() . $node->id();
+  $enabled_types = $config->get('content_types');
+  $enabled_view_modes = $config->get('view_modes.' . $node->bundle());
+  $per_entity = $config->get('per_entity');
+  $enabled_nodes = $config->get('enabled_entities.' . $node->getEntityTypeId()) ?? [];
+  switch ($config->get('location')) {
+    case 'content':
+      if (isset($enabled_types[$node->bundle()]) && $enabled_types[$node->bundle()] === $node->bundle() && $display->getComponent('webshare')) {
+        if (isset($enabled_view_modes[$view_mode]) && $enabled_view_modes[$view_mode]) {
+          if (!$per_entity || in_array($node->id(), $enabled_nodes)) {
+            $build['webshare'] = $share_service->build($url, $id);
+          }
+        }
+      }
+      break;
+
+    case 'links':
+      if (isset($enabled_types[$node->bundle()]) && $enabled_types[$node->bundle()] === $node->bundle() && $display->getComponent('links')) {
+        if (isset($enabled_view_modes[$view_mode]) && $enabled_view_modes[$view_mode]) {
+          if (!$per_entity || in_array($node->id(), $enabled_nodes)) {
+            $content = $share_service->build($url, $id);
+            $links['webshare'] = [
+              'title' => $content,
+            ];
+            $build['links'] = [
+              '#theme' => 'links',
+              '#links' => $links,
+              '#tag' => 'div',
+              '#type' => 'html_tag',
+            ];
+          }
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_form_BAwebshare_FORM_ID_alter().
+ */
+function webshare_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  webshare_inject_into_entity_forms($form, $form_state);
+}
+
+/**
+ * Implements hook_form_BAwebshare_FORM_ID_alter().
+ */
+function webshare_form_commerce_product_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  webshare_inject_into_entity_forms($form, $form_state);
+}
+
+/**
+ * Injects Webshare settings into node or product forms.
+ */
+function webshare_inject_into_entity_forms(&$form, FormStateInterface $form_state) {
+  $config = \Drupal::config('webshare.settings');
+  $entity = $form_state->getFormObject()->getEntity();
+
+  if ($entity->getEntityTypeId() == 'commerce_product') {
+    $enabled_types = $config->get('product_types');
+  }
+  else {
+    $enabled_types = $config->get('content_types');
+  }
+
+  if ($config->get('per_entity') && in_array($entity->bundle(), $enabled_types)) {
+    $enabled_products = $config->get('enabled_entities.' . $entity->getEntityTypeId()) ?? [];
+    $entity_is_enabled = in_array($entity->id(), $enabled_products);
+
+    $form['webshare'] = [
+      '#type' => 'details',
+      '#title' => t('Webshare Settings'),
+      '#group' => 'advanced',
+      '#weight' => 100,
+      '#tree' => TRUE,
+      '#open' => $entity_is_enabled,
+    ];
+    $form['webshare']['enabled'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Show social share buttons'),
+      '#default_value' => $entity_is_enabled,
+    ];
+
+    $form['actions']['submit']['#submit'][] = 'webshare_entity_form_submit';
+  }
+}
+
+/**
+ * Custom form submit to save Webshare settings on entities.
+ */
+function webshare_entity_form_submit(&$form, FormStateInterface $form_state) {
+  $config = \Drupal::configFactory()->getEditable('webshare.settings');
+  $entity = $form_state->getFormObject()->getEntity();
+  $config_key = 'enabled_entities.' . $entity->getEntityTypeId();
+  $enabled_entities = $config->get($config_key) ?? [];
+  $webshare_enabled = $form_state->getValue(['webshare', 'enabled'], 0);
+  $key = array_search($entity->id(), $enabled_entities);
+
+  if ($key !== FALSE && !$webshare_enabled) {
+    unset($enabled_entities[$key]);
+    $config->set($config_key, array_values($enabled_entities))->save();
+  }
+  elseif ($key === FALSE && $webshare_enabled) {
+    $enabled_entities[] = $entity->id();
+    $config->set($config_key, $enabled_entities)->save();
+  }
+}

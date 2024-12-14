@@ -1,0 +1,3 @@
+views.field.webshare_field:
+  type: views_field
+  label: 'Webshare field'

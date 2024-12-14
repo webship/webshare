@@ -1,0 +1,15 @@
+{
+    "name": "drupal/webshare",
+    "description": "Drupal social share module",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Webship.co",
+            "email": "info@webship.co"
+        }
+    ],
+    "require": {
+        "drupal/core": " ^10 || ^11 "
+    }
+}

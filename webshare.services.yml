@@ -1,0 +1,7 @@
+services:
+  webshare.service:
+    class: Drupal\webshare\WebshareService
+    arguments:
+      - '@config.factory'
+      - '@plugin.manager.condition'
+      - '@extension.list.module'

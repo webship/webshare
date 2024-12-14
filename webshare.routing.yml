@@ -1,0 +1,7 @@
+webshare.config_form:
+  path: 'admin/config/services/webshare'
+  defaults:
+    _form: '\Drupal\webshare\Form\WebshareConfigForm'
+    _title: 'Webshare'
+  requirements:
+    _permission: 'administer webshare'

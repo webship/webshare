@@ -1,0 +1,8 @@
+name: Webshare
+type: module
+description: 'Enabling effortless content sharing on popular social media platforms. It provides users with customizable share buttons for networks like Facebook, X, LinkedIn, and more, helping you amplify your content reach easily.'
+core_version_requirement: ^10 || ^11
+configure: webshare.config_form
+dependencies:
+  - drupal:path_alias
+

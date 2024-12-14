@@ -1,0 +1,81 @@
+webshare.settings:
+  type: config_object
+  mapping:
+    buttons:
+      type: mapping
+      mapping:
+        facebook_share:
+          type: webshare.image_button
+        x:
+          type: webshare.image_button
+        linkedin:
+          type: webshare.image_button
+        whatsapp:
+          type: webshare.image_button
+        copy:
+          type: webshare.image_button
+    title:
+      type: string
+    display_title:
+      type: integer
+    style:
+      type: string
+    include_css:
+      type: string
+    include_js:
+      type: string
+    alignment:
+      type: string
+    per_entity:
+      type: integer
+    content_types:
+      type: sequence
+      sequence:
+        type: string
+    view_modes:
+      type: sequence
+      sequence:
+        type: sequence
+        sequence:
+          type: string
+    product_types:
+      type: sequence
+      sequence:
+        type: string
+    product_view_modes:
+      type: sequence
+      sequence:
+        type: sequence
+        sequence:
+          type: string
+    restricted_pages:
+      type: mapping
+      mapping:
+        pages:
+          type: sequence
+          sequence:
+            type: string
+        type:
+          type: string
+    enabled_entities:
+      type: sequence
+      sequence:
+        type: sequence
+        sequence:
+          type: integer
+    weight:
+      type: integer
+
+webshare.image_button:
+  type: mapping
+  mapping:
+    name:
+      type: string
+    title:
+      type: string
+    enabled:
+      type: integer
+    image:
+      type: string
+    weight:
+      type: integer

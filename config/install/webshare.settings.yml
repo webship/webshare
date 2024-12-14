@@ -1,0 +1,57 @@
+buttons:
+  facebook_share:
+    name: 'Facebook share'
+    title: 'Share on Facebook'
+    enabled: 1
+    image: 'facebook-share.svg'
+    weight: 0
+  x:
+    name: 'X'
+    title: 'Share on X'
+    enabled: 1
+    image: 'x.svg'
+    weight: 1
+  linkedin:
+    name: 'LinkedIn'
+    title: 'Share on LinkedIn'
+    enabled: 1
+    image: 'linkedin.svg'
+    weight: 2
+  whatsapp:
+    name: 'WhatsApp'
+    title: 'Share via WhatsApp'
+    enabled: 1
+    image: 'whatsapp.svg'
+    weight: 5
+  copy:
+    name: 'Copy URL'
+    title: 'Copy site URL'
+    enabled: 1
+    image: copy-url.svg
+    weight: 6
+share_icon:
+  image: 'share-icon.svg'
+  alt: 'Share icon'
+title: 'Share'
+display_title: 1
+style: 'webshare'
+include_css: 'include_css'
+include_js: 'include_js'
+alignment: 'left'
+content_types:
+  article: 'article'
+  page: 'page'
+view_modes:
+  article:
+    full: 'full'
+  page:
+    full: 'full'
+product_types:
+  default: 'default'
+product_view_modes:
+  default:
+    full: 'full'
+restricted_pages:
+  pages: { }
+  type: 'show'
+weight: 10

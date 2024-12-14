@@ -1,0 +1,167 @@
+@keyframes webshare-animation-left-inactive {
+    0% {
+        inset-inline-start:0;
+        opacity: 1;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        inset-inline-start:-400px;
+    }
+    100% {
+        opacity: 0;
+        inset-inline-start:-400px;
+    }
+}
+
+@keyframes webshare-animation-left-active {
+    0% {
+        inset-inline-start:-400px;
+        opacity: 0;
+    }
+    50% {
+        inset-inline-start:0;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        inset-inline-start:0;
+    }
+}
+
+@keyframes webshare-animation-right-inactive {
+    0% {
+        opacity: 1;
+        inset-inline-end:0;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        inset-inline-end:-400px;
+    }
+    100% {
+        opacity: 0;
+        inset-inline-end:-400px;
+    }
+}
+
+@keyframes webshare-animation-right-active {
+    0% {
+        inset-inline-end:-400px;
+        opacity: 0;
+    }
+    50% {
+        inset-inline-end:-400px;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        inset-inline-end:0;
+        opacity: 1;
+    }
+}
+
+.block-webshare-block {
+
+    position: fixed;
+    inset-block-start: 150px;
+    height: 245px;
+    width: 60px !important;
+     background-color: #F3F6F8;
+
+    & .block-title {
+        position:absolute;
+        inset-block-start: -70px;
+        font-size: medium;
+    }
+    & .block-content {
+        & .webshare-container {
+            width: 100%;
+            & .webshare-links-container {
+                box-sizing: border-box;
+                position: relative;
+                margin-inline-start: auto;
+                margin-inline-end: auto;
+                width: 50%;
+                & .webshare-links {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                    &  .webshare-link {
+                        line-height: 0;
+                        margin-block-start: 15px;
+                        & img {
+                            max-height: 36px;
+                            border-radius: 12px;
+                        }
+                        &.copy {
+                                cursor: pointer;
+                        }
+                    }
+                    animation-duration: 0.75s;
+                    animation-iteration-count: 1;
+                    animation-timing-function: linear;
+                    animation-direction: alternate;
+                    animation-fill-mode: forwards;
+                }
+            }
+        }
+    }
+    &.webshare-left {
+
+        inset-inline-end:0px;
+
+        .block-title {
+            text-align: left;
+        }
+        & .block-content {
+            & .webshare-container {
+                float: right;
+              
+                & .webshare-links-container {
+                    float: left;
+                    margin-inline-start: 12px;
+                    & .webshare-links {
+                        text-align: left;
+                        & .webshare-active {
+                            animation-name: webshare-animation-left-active;
+                        }
+                        & .webshare-inactive {
+                            animation-name: webshare-animation-left-inactive;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    &.webshare-right {
+        inset-inline-start:0px;
+
+        & .block-title {
+            text-align: right;
+        }
+        & .block-content {
+            & .webshare-container {
+                float: left;
+                &  .webshare-links-container {
+                    float: right;
+                    margin-right: 12px;
+                    &  .webshare-links {
+                        text-align: right;
+                        & .webshare-active {
+                            animation-name: webshare-animation-right-active;
+                        }
+                        & .webshare-inactive {
+                            animation-name: webshare-animation-right-inactive;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
