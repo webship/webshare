@@ -1,15 +1,20 @@
 {
     "name": "drupal/webshare",
-    "description": "Drupal social share module",
+    "description": "Enabling effortless content sharing on popular social media platforms. It provides users with customizable share buttons for networks like Facebook, X, LinkedIn, and more, helping you amplify your content reach easily.",
     "type": "drupal-module",
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "Webship.co",
+            "name": "Webship",
+            "homepage": "http://webship.co",
             "email": "info@webship.co"
         }
     ],
+    "support": {
+      "issues": "https://www.drupal.org/project/issues/webshare",
+      "source": "http://cgit.drupalcode.org/webshare"
+    },
     "require": {
-        "drupal/core": " ^10 || ^11 "
+        "drupal/core": "~10.4.0 || ^11"
     }
 }
