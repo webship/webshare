@@ -66,12 +66,20 @@
     }
 }
 
+.show-menu-left {
+    inset-inline-end:0 !important;
+  }
+
+ .show-menu-right {
+    inset-inline-start:0 !important;
+  }
+
 .block-webshare-block {
 
     position: fixed;
-    inset-block-start: 150px;
-    height: 245px;
-    width: 60px !important;
+    inset-block-start: 200px;
+    padding-block-end: 20px;
+    width: 55px !important;
      background-color: #F3F6F8;
 
     & .block-title {
@@ -114,7 +122,8 @@
     }
     &.webshare-left {
 
-        inset-inline-end:0px;
+        inset-inline-end:-60px;
+        transition: right 0.5s ease-out;
 
         .block-title {
             text-align: left;
@@ -140,7 +149,8 @@
         }
     }
     &.webshare-right {
-        inset-inline-start:0px;
+        inset-inline-start:-60px;
+        transition: left 0.5s ease-out;
 
         & .block-title {
             text-align: right;

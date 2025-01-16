@@ -1,5 +1,4 @@
 (function ($, Drupal, once) {
-
   'use strict';
 
   Drupal.behaviors.WebShare = {
@@ -47,4 +46,47 @@
     }
   };
 
+  Drupal.behaviors.WebShareScroll = {
+    attach: function (context, settings) {
+      // Ensure the scroll listener is added only once
+      $(once('webshare-scroll', 'body', context)).each(function () {
+        window.addEventListener('scroll', function () {
+          // Select both left and right menus
+          const menus = document.querySelectorAll('.webshare-left, .webshare-right');
+          const main = document.querySelector('main'); // Main content area
+          const footer = document.querySelector('footer'); // Footer element
+  
+          if (menus.length > 0 && main && footer) {
+            const scrollPosition = window.scrollY;
+            const mainTop = main.getBoundingClientRect().top + window.scrollY;
+            const mainBottom = main.getBoundingClientRect().bottom + window.scrollY;
+            const footerTop = footer.getBoundingClientRect().top + window.scrollY;
+  
+            menus.forEach(menu => {
+              const menuHeight = menu.offsetHeight;
+              const menuTop = scrollPosition;
+              const menuBottom = menuTop + menuHeight;
+  
+              // Determine the specific class to add based on the menu type
+              const showClass = menu.classList.contains('webshare-left')
+                ? 'show-menu-left'
+                : 'show-menu-right';
+  
+              // Add or remove the appropriate class based on scroll position
+              if (
+                menuTop >= mainTop &&
+                menuBottom <= mainBottom &&
+                menuBottom < footerTop
+              ) {
+                menu.classList.add(showClass);
+              } else {
+                menu.classList.remove(showClass);
+              }
+            });
+          }
+        });
+      });
+    },
+  };
+  
 })(jQuery, Drupal, once);

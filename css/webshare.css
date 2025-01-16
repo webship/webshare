@@ -66,12 +66,20 @@
     }
 }
 
+.show-menu-left {
+    inset-inline-end:0 !important;
+  }
+
+.show-menu-right {
+    inset-inline-start:0 !important;
+  }
+
 .block-webshare-block {
 
     position: fixed;
-    inset-block-start: 8.33333rem;
-    height: 13.61111rem;
-    width: 3.33333rem !important;
+    inset-block-start: 11.11111rem;
+    padding-block-end: 1.11111rem;
+    width: 3.05556rem !important;
      background-color: #F3F6F8
 }
 
@@ -123,7 +131,8 @@
 
 .block-webshare-block.webshare-left {
 
-        inset-inline-end:0px;
+        inset-inline-end:-3.33333rem;
+        transition: right 0.5s ease-out;
 
         .block-title {
             text-align: left;
@@ -152,7 +161,8 @@
                         }
 
 .block-webshare-block.webshare-right {
-        inset-inline-start:0px
+        inset-inline-start:-3.33333rem;
+        transition: left 0.5s ease-out
     }
 
 .block-webshare-block.webshare-right .block-title {

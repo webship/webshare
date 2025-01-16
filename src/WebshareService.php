@@ -133,6 +133,7 @@ class WebshareService implements WebshareServiceInterface {
       else {
         $library = [
           'webshare/webshare-styles',
+          'webshare/webshare-script',
         ];
       }
     }
