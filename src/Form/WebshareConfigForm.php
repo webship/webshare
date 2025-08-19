@@ -4,6 +4,7 @@ namespace Drupal\webshare\Form;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -65,6 +66,8 @@ class WebshareConfigForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   *   The typed config manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module Handler.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
@@ -78,8 +81,8 @@ class WebshareConfigForm extends ConfigFormBase {
    * @param \Drupal\Core\Cache\CacheBackendInterface $render_cache
    *   The render cache.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, PathValidator $path_validator, CacheBackendInterface $render_cache) {
-    parent::__construct($config_factory);
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config_manager, ModuleHandlerInterface $module_handler, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, PathValidator $path_validator, CacheBackendInterface $render_cache) {
+    parent::__construct($config_factory, $typed_config_manager);
     $this->moduleHandler = $module_handler;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityDisplayRepository = $entity_display_repository;
@@ -94,6 +97,7 @@ class WebshareConfigForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('module_handler'),
       $container->get('entity_type.bundle.info'),
       $container->get('entity_display.repository'),
@@ -236,6 +240,32 @@ class WebshareConfigForm extends ConfigFormBase {
       ],
       '#description' => $this->t('Select which side of the page the buttons will appear on.'),
       '#default_value' => $config->get('alignment'),
+    ];
+    
+    $form['display']['location'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Location'),
+      '#options' => [
+        'content' => $this->t('Content'),
+        'links' => $this->t('Links'),
+      ],
+      '#description' => $this->t('Select where to display the share buttons.'),
+      '#default_value' => $config->get('location') ?: 'content',
+    ];
+    
+    $form['display']['collapsible'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Collapsible'),
+      '#description' => $this->t('Make the share buttons collapsible with a trigger icon.'),
+      '#default_value' => $config->get('collapsible') ?: 1,
+    ];
+    
+    $form['display']['weight'] = [
+      '#type' => 'weight',
+      '#title' => $this->t('Weight'),
+      '#description' => $this->t('Display order weight for the share buttons.'),
+      '#default_value' => $config->get('weight') ?: 10,
+      '#delta' => 50,
     ];
     $form['display']['per_entity'] = [
       '#type' => 'checkbox',
@@ -403,6 +433,8 @@ class WebshareConfigForm extends ConfigFormBase {
       ->set('include_js', $form_values['libraries']['include_js'])
       ->set('location', $form_values['location'])
       ->set('alignment', $form_values['alignment'])
+      ->set('collapsible', $form_values['collapsible'])
+      ->set('weight', $form_values['weight'])
       ->set('per_entity', $form_values['per_entity'])
       ->set('content_types', $form_values['content_types'])
       ->save();

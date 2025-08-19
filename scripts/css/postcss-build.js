@@ -16,7 +16,7 @@
 
 'use strict';
 
-const glob = require('glob');
+const { glob } = require('glob');
 const argv = require('minimist')(process.argv.slice(2));
 const changeOrAdded = require('./changeOrAdded');
 const check = require('./check');
