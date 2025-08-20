@@ -75,11 +75,12 @@
   }
 
 .block-webshare-block {
+
     position: fixed;
-    width: 55px !important;
-    padding-block-end: 20px;
-     background-color: #F3F6F8;
     inset-block-start: 200px;
+    padding-block-end: 20px;
+    width: 55px !important;
+     background-color: #F3F6F8;
 
     & .block-title {
         position:absolute;
@@ -90,23 +91,18 @@
         & .webshare-container {
             width: 100%;
             & .webshare-links-container {
-                position: relative;
                 box-sizing: border-box;
-                width: 50%;
+                position: relative;
                 margin-inline-start: auto;
                 margin-inline-end: auto;
+                width: 50%;
                 & .webshare-links {
                     margin: 0;
                     padding: 0;
                     list-style: none;
-                    animation-duration: 0.75s;
-                    animation-timing-function: linear;
-                    animation-iteration-count: 1;
-                    animation-direction: alternate;
-                    animation-fill-mode: forwards;
                     &  .webshare-link {
-                        margin-block-start: 15px;
                         line-height: 0;
+                        margin-block-start: 13px;
                         & img {
                             max-height: 36px;
                             border-radius: 12px;
@@ -115,11 +111,17 @@
                                 cursor: pointer;
                         }
                     }
+                    animation-duration: 0.75s;
+                    animation-iteration-count: 1;
+                    animation-timing-function: linear;
+                    animation-direction: alternate;
+                    animation-fill-mode: forwards;
                 }
             }
         }
     }
     &.webshare-left {
+
         inset-inline-end:-60px;
         transition: right 0.5s ease-out;
 
@@ -132,7 +134,7 @@
               
                 & .webshare-links-container {
                     float: left;
-                    margin-inline-start: 12px;
+                    margin-inline-start: 10px;
                     & .webshare-links {
                         text-align: left;
                         & .webshare-active {
@@ -158,7 +160,7 @@
                 float: left;
                 &  .webshare-links-container {
                     float: right;
-                    margin-right: 12px;
+                    margin-right: 10px;
                     &  .webshare-links {
                         text-align: right;
                         & .webshare-active {
