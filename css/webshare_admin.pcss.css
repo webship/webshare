@@ -1,0 +1,267 @@
+/**
+ * Administrative styles for Webshare module with tour-like design.
+ * This PCSS file will be compiled to webshare_admin.css
+ */
+
+/* CSS Custom Properties */
+:root {
+  --webshare-primary: #007cba;
+  --webshare-primary-dark: #005177;
+  --webshare-secondary: #9c27b0;
+  --webshare-bg-light: #f8f9fa;
+  --webshare-bg-blue: #e3f2fd;
+  --webshare-bg-purple: #f3e5f5;
+  --webshare-border: #dee2e6;
+  --webshare-text: #333;
+  --webshare-text-muted: #555;
+  --webshare-text-light: #666;
+  --webshare-spacing: 20px;
+  --webshare-spacing-sm: 15px;
+  --webshare-border-radius: 8px;
+  --webshare-transition: all 0.2s ease;
+}
+
+/* Setup guide styling */
+.webshare-setup-guide {
+  background: var(--webshare-bg-light);
+  border: 1px solid var(--webshare-border);
+  border-radius: var(--webshare-border-radius);
+  padding: var(--webshare-spacing);
+  margin-bottom: var(--webshare-spacing);
+}
+
+.setup-guide-intro {
+  h3 {
+    color: var(--webshare-primary);
+    margin-top: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 0;
+    color: var(--webshare-text-muted);
+    line-height: 1.6;
+  }
+}
+
+/* Platform management styling */
+.platforms-management-intro {
+  background: var(--webshare-bg-blue);
+  border-left: 4px solid var(--webshare-primary);
+  padding: var(--webshare-spacing-sm);
+  margin-bottom: var(--webshare-spacing);
+
+  p {
+    margin: 0;
+    color: var(--webshare-text-muted);
+  }
+}
+
+.display-settings-intro {
+  background: var(--webshare-bg-purple);
+  border-left: 4px solid var(--webshare-secondary);
+  padding: var(--webshare-spacing-sm);
+  margin-bottom: var(--webshare-spacing);
+
+  p {
+    margin: 0;
+    color: var(--webshare-text-muted);
+  }
+}
+
+/* Platform table styling */
+.platform-info {
+  padding: 8px 0;
+
+  strong {
+    display: block;
+    color: var(--webshare-text);
+    font-size: 1.1em;
+    margin-bottom: 4px;
+  }
+}
+
+.platform-description {
+  font-size: 0.9em;
+  color: var(--webshare-text-light);
+  font-style: italic;
+}
+
+/* Add platform section */
+.add-platform-section {
+  border-top: 2px solid #e9ecef;
+  padding-top: var(--webshare-spacing);
+  margin-top: var(--webshare-spacing);
+  text-align: center;
+
+  .button--primary {
+    background-color: var(--webshare-primary);
+    border-color: var(--webshare-primary);
+    color: white;
+    padding: 10px 20px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 4px;
+    transition: var(--webshare-transition);
+
+    &:hover {
+      background-color: var(--webshare-primary-dark);
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+/* Modal form styling */
+.webshare-platform-form {
+  width: 100%;
+  max-width: none;
+
+  .form-item {
+    margin-bottom: 1em;
+
+    label {
+      font-weight: 600;
+      color: var(--webshare-text);
+    }
+  }
+
+  .description {
+    font-size: 0.9em;
+    color: var(--webshare-text-light);
+    margin-top: 0.25em;
+  }
+}
+
+/* Vertical tabs enhancement */
+.vertical-tabs {
+  border: 1px solid var(--webshare-border);
+  border-radius: var(--webshare-border-radius);
+  overflow: hidden;
+}
+
+.vertical-tabs__menu {
+  background: var(--webshare-bg-light);
+  border-right: 1px solid var(--webshare-border);
+}
+
+.vertical-tabs__menu-item {
+  border-bottom: 1px solid var(--webshare-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.vertical-tabs__menu-item-link {
+  padding: var(--webshare-spacing-sm) var(--webshare-spacing);
+  color: #495057;
+  font-weight: 500;
+  transition: var(--webshare-transition);
+
+  &:hover {
+    background-color: #e9ecef;
+    color: var(--webshare-primary);
+    text-decoration: none;
+  }
+
+  &.is-selected {
+    background-color: var(--webshare-primary);
+    color: white;
+    border-left: 4px solid var(--webshare-primary-dark);
+  }
+}
+
+.vertical-tabs__panes {
+  padding: var(--webshare-spacing);
+  background: white;
+}
+
+/* Table drag and drop enhancement */
+.tabledrag-handle {
+  margin-right: 10px;
+}
+
+.draggable {
+  &:hover {
+    background-color: var(--webshare-bg-light);
+  }
+}
+
+/* Operations styling */
+.dropbutton-wrapper {
+  margin: 0;
+}
+
+.dropbutton-widget {
+  border: 1px solid var(--webshare-border);
+  border-radius: 4px;
+}
+
+.dropbutton {
+  li {
+    border: none;
+
+    &:first-child {
+      border-radius: 4px 0 0 4px;
+    }
+
+    &:last-child {
+      border-radius: 0 4px 4px 0;
+    }
+  }
+
+  .dropbutton-action a {
+    padding: 6px 12px;
+    color: var(--webshare-primary);
+    font-size: 0.9em;
+    transition: var(--webshare-transition);
+
+    &:hover {
+      background-color: var(--webshare-bg-light);
+      text-decoration: none;
+    }
+  }
+}
+
+/* Success/error message styling */
+.messages {
+  &--status {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+
+  &--error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+
+  &--warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    color: #856404;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .vertical-tabs__menu {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--webshare-border);
+  }
+  
+  .vertical-tabs__panes {
+    padding: var(--webshare-spacing-sm);
+  }
+  
+  .setup-guide-intro,
+  .platforms-management-intro,
+  .display-settings-intro {
+    padding: 12px;
+  }
+}

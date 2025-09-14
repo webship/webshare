@@ -10,3 +10,10 @@ webshare-script:
     - core/jquery
     - core/drupal
     - core/once
+
+webshare-admin:
+  css:
+    theme:
+      css/webshare_admin.css: {}
+  dependencies:
+    - core/drupal.vertical-tabs

@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Generic template for social media sharing platforms.
+ *
+ * Available variables:
+ *  - url: The url of the page to be shared.
+ *  - content: The button's image or other content to appear on the page.
+ *  - platform: Platform object with configuration data.
+ *
+ */
+#}
+{% set page_title = '' %}
+{% if platform and platform.url_template %}
+  {% if platform.url_template is empty %}
+    {# Copy URL functionality #}
+    <a href="#" class="webshare-copy-url" data-url="{{ url }}" data-clipboard="{{ url }}">{{ content }}</a>
+  {% else %}
+    {# Standard sharing URL #}
+    {% set sharing_url = platform.url_template|replace({'[url]': url|url_encode, '[title]': page_title|url_encode}) %}
+    <a href="{{ sharing_url }}" target="_blank" rel="noreferrer" title="{{ platform.title }}">{{ content }}</a>
+  {% endif %}
+{% else %}
+  {# Fallback for platforms without URL template #}
+  <span>{{ content }}</span>
+{% endif %}

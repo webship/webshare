@@ -102,7 +102,7 @@
                     list-style: none;
                     &  .webshare-link {
                         line-height: 0;
-                        margin-block-start: 13px;
+                        margin-block-start: 15px;
                         & img {
                             max-height: 36px;
                             border-radius: 12px;
@@ -134,7 +134,7 @@
               
                 & .webshare-links-container {
                     float: left;
-                    margin-inline-start: 10px;
+                    margin-inline-start: 12px;
                     & .webshare-links {
                         text-align: left;
                         & .webshare-active {
@@ -160,7 +160,7 @@
                 float: left;
                 &  .webshare-links-container {
                     float: right;
-                    margin-right: 10px;
+                    margin-right: 12px;
                     &  .webshare-links {
                         text-align: right;
                         & .webshare-active {

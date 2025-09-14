@@ -1,0 +1,259 @@
+/**
+ * Administrative styles for Webshare module with tour-like design.
+ * Compiled from webshare_admin.pcss.css
+ */
+
+/* CSS Custom Properties - converted to static values for better browser support */
+/* Variables used: 
+   --webshare-primary: #007cba
+   --webshare-primary-dark: #005177
+   --webshare-secondary: #9c27b0
+   --webshare-bg-light: #f8f9fa
+   --webshare-bg-blue: #e3f2fd
+   --webshare-bg-purple: #f3e5f5
+   --webshare-border: #dee2e6
+   --webshare-text: #333
+   --webshare-text-muted: #555
+   --webshare-text-light: #666
+   --webshare-spacing: 20px
+   --webshare-spacing-sm: 15px
+   --webshare-border-radius: 8px
+   --webshare-transition: all 0.2s ease
+*/
+
+/* Setup guide styling */
+.webshare-setup-guide {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.setup-guide-intro h3 {
+  color: #007cba;
+  margin-top: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.setup-guide-intro p {
+  margin-bottom: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Platform management styling */
+.platforms-management-intro {
+  background: #e3f2fd;
+  border-left: 4px solid #007cba;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.platforms-management-intro p {
+  margin: 0;
+  color: #555;
+}
+
+.display-settings-intro {
+  background: #f3e5f5;
+  border-left: 4px solid #9c27b0;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.display-settings-intro p {
+  margin: 0;
+  color: #555;
+}
+
+/* Platform table styling */
+.platform-info {
+  padding: 8px 0;
+}
+
+.platform-info strong {
+  display: block;
+  color: #333;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+
+.platform-description {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+}
+
+/* Add platform section */
+.add-platform-section {
+  border-top: 2px solid #e9ecef;
+  padding-top: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.add-platform-section .button--primary {
+  background-color: #007cba;
+  border-color: #007cba;
+  color: white;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.add-platform-section .button--primary:hover {
+  background-color: #005177;
+  color: white;
+  text-decoration: none;
+}
+
+/* Modal form styling */
+.webshare-platform-form {
+  width: 100%;
+  max-width: none;
+}
+
+.webshare-platform-form .form-item {
+  margin-bottom: 1em;
+}
+
+.webshare-platform-form .form-item label {
+  font-weight: 600;
+  color: #333;
+}
+
+.webshare-platform-form .description {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 0.25em;
+}
+
+/* Vertical tabs enhancement */
+.vertical-tabs {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.vertical-tabs__menu {
+  background: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+.vertical-tabs__menu-item {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.vertical-tabs__menu-item:last-child {
+  border-bottom: none;
+}
+
+.vertical-tabs__menu-item-link {
+  padding: 15px 20px;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.vertical-tabs__menu-item-link:hover {
+  background-color: #e9ecef;
+  color: #007cba;
+  text-decoration: none;
+}
+
+.vertical-tabs__menu-item-link.is-selected {
+  background-color: #007cba;
+  color: white;
+  border-left: 4px solid #005177;
+}
+
+.vertical-tabs__panes {
+  padding: 20px;
+  background: white;
+}
+
+/* Table drag and drop enhancement */
+.tabledrag-handle {
+  margin-right: 10px;
+}
+
+.draggable:hover {
+  background-color: #f8f9fa;
+}
+
+/* Operations styling */
+.dropbutton-wrapper {
+  margin: 0;
+}
+
+.dropbutton-widget {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.dropbutton li {
+  border: none;
+}
+
+.dropbutton li:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.dropbutton li:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.dropbutton .dropbutton-action a {
+  padding: 6px 12px;
+  color: #007cba;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+
+.dropbutton .dropbutton-action a:hover {
+  background-color: #f8f9fa;
+  text-decoration: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .vertical-tabs__menu {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .vertical-tabs__panes {
+    padding: 15px;
+  }
+  
+  .setup-guide-intro,
+  .platforms-management-intro,
+  .display-settings-intro {
+    padding: 12px;
+  }
+}
+
+/* Success/error message styling */
+.messages--status {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.messages--error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.messages--warning {
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+  color: #856404;
+}

@@ -5,4 +5,3 @@ core_version_requirement: ^10 || ^11
 configure: webshare.config_form
 dependencies:
   - drupal:path_alias
-

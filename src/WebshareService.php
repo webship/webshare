@@ -4,6 +4,7 @@ namespace Drupal\webshare;
 
 use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -36,6 +37,13 @@ class WebshareService implements WebshareServiceInterface {
   protected $moduleExtensionList;
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * Constructs an WebshareService object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -44,11 +52,14 @@ class WebshareService implements WebshareServiceInterface {
    *   The condition manager.
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The extenstion list module.
+   * @param \Drupal\Core\Database\Connection $database
+   *   The database connection.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ConditionManager $condition_manager, ModuleExtensionList $module_extension_list) {
+  public function __construct(ConfigFactoryInterface $config_factory, ConditionManager $condition_manager, ModuleExtensionList $module_extension_list, Connection $database) {
     $this->configFactory = $config_factory;
     $this->conditionManager = $condition_manager;
     $this->moduleExtensionList = $module_extension_list;
+    $this->database = $database;
   }
 
   /**
@@ -76,33 +87,79 @@ class WebshareService implements WebshareServiceInterface {
         break;
     }
 
-    $share_buttons = $config->get('buttons');
-    uasort($share_buttons, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
-
-    foreach ($share_buttons as $key => $button) {
-      if ($key == $button['enabled']) {
-        $build['#attributes']['class'][] = 'webshare-has-like';
+    // Get enabled platforms from database (fallback to config if table doesn't exist)
+    $platforms = [];
+    try {
+      if ($this->database->schema()->tableExists('webshare_platforms')) {
+        $platforms = $this->database
+          ->select('webshare_platforms', 'wp')
+          ->fields('wp')
+          ->condition('enabled', 1)
+          ->orderBy('weight')
+          ->orderBy('name')
+          ->execute()
+          ->fetchAll();
       }
-      elseif ($button['enabled']) {
-        $buttons[$key] = [
-          '#theme' => 'webshare_' . $key,
-          '#url' => $url,
-        ];
+    } catch (\Exception $e) {
+      // If database access fails, fall back to empty array
+    }
+    
+    // Fallback to legacy config if no platforms in database
+    if (empty($platforms)) {
+      $share_buttons = $config->get('buttons');
+      if ($share_buttons) {
+        uasort($share_buttons, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
+        foreach ($share_buttons as $key => $button) {
+          if ($key != 'facebook_like' && $button['enabled']) {
+            // Create a pseudo-platform object for backward compatibility
+            $platform = (object) [
+              'platform_id' => $key,
+              'name' => $button['name'],
+              'title' => $button['title'] ?? $button['name'],
+              'enabled' => $button['enabled'],
+              'image' => $module_path . '/img/' . $button['image'],
+              'weight' => $button['weight'] ?? 0,
+              'url_template' => $this->getDefaultUrlTemplate($key),
+            ];
+            $platforms[] = $platform;
+          }
+        }
+      }
+    }
 
-        if ($config->get('style') == 'webshare') {
-          $buttons[$key]['#content'] = [
-            '#type' => 'html_tag',
-            '#tag' => 'img',
-            '#attributes' => [
-              'src' => $base_url . '/' . $module_path . '/img/' . $button['image'],
-              'title' => $this->t($button['title']),
-              'alt' => $this->t($button['title']),
-            ],
-          ];
+    foreach ($platforms as $platform) {
+      $key = $platform->platform_id;
+      $buttons[$key] = [
+        '#theme' => 'webshare_' . $key,
+        '#url' => $url,
+        '#platform' => $platform,
+      ];
+
+      if ($config->get('style') == 'webshare') {
+        $image_src = $platform->image;
+        // If image path doesn't contain module path, prepend it
+        if (!str_contains($image_src, $module_path) && !str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
+          $image_src = $module_path . '/img/' . $image_src;
         }
-        elseif ($config->get('style') == 'custom') {
-          $buttons[$key]['#content'] = $this->t($button['name']);
+        // Handle both relative and absolute paths
+        if (!str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
+          $image_src = $base_url . '/' . $image_src;
+        } elseif (str_starts_with($image_src, '/')) {
+          $image_src = $base_url . $image_src;
         }
+        
+        $buttons[$key]['#content'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'img',
+          '#attributes' => [
+            'src' => $image_src,
+            'title' => $this->t($platform->title),
+            'alt' => $this->t($platform->title),
+          ],
+        ];
+      }
+      elseif ($config->get('style') == 'custom') {
+        $buttons[$key]['#content'] = $this->t($platform->name);
       }
     }
     $build['#buttons'] = $buttons;
@@ -189,6 +246,20 @@ class WebshareService implements WebshareServiceInterface {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Get default URL template for legacy platforms.
+   */
+  private function getDefaultUrlTemplate($platform_id) {
+    $templates = [
+      'facebook_share' => 'https://www.facebook.com/sharer/sharer.php?u=[url]',
+      'x' => 'https://twitter.com/intent/tweet?url=[url]&text=[title]',
+      'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=[url]',
+      'whatsapp' => 'https://api.whatsapp.com/send?text=[title]%20[url]',
+      'copy' => '',
+    ];
+    return $templates[$platform_id] ?? '';
   }
 
 }

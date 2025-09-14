@@ -17,7 +17,9 @@ function webshare_theme($existing, $type, $theme, $path) {
   $template_vars = [
     'url' => NULL,
     'content' => NULL,
+    'platform' => NULL,
   ];
+  
   $variables = [
     'webshare' => [
       'variables' => [
@@ -32,27 +34,40 @@ function webshare_theme($existing, $type, $theme, $path) {
       ],
       'template' => 'webshare',
     ],
-    'webshare_facebook_share' => [
-      'variables' => $template_vars,
-      'template' => 'webshare-facebook-share',
-    ],
-    'webshare_x' => [
-      'variables' => $template_vars,
-      'template' => 'webshare-x',
-    ],
-    'webshare_linkedin' => [
-      'variables' => $template_vars,
-      'template' => 'webshare-linkedin',
-    ],
-    'webshare_whatsapp' => [
-      'variables' => $template_vars,
-      'template' => 'webshare-whatsapp',
-    ],
-    'webshare_copy' => [
-      'variables' => $template_vars,
-      'template' => 'webshare-copy-url',
-    ],
   ];
+  
+  // Get all platforms from database and register theme hooks dynamically
+  // Only do this if the database and table exist to prevent bootstrap errors
+  try {
+    $database = \Drupal::database();
+    if ($database->schema()->tableExists('webshare_platforms')) {
+      $platforms = $database->select('webshare_platforms', 'wp')
+        ->fields('wp', ['platform_id'])
+        ->execute()
+        ->fetchCol();
+        
+      foreach ($platforms as $platform_id) {
+        $variables['webshare_' . $platform_id] = [
+          'variables' => $template_vars,
+          'template' => 'webshare-platform',
+        ];
+      }
+    }
+  } catch (\Exception $e) {
+    // If database is not available during installation, just use fallback platforms
+  }
+  
+  // Add fallback theme hooks for any missing platforms
+  $fallback_platforms = ['facebook_share', 'x', 'linkedin', 'whatsapp', 'copy'];
+  foreach ($fallback_platforms as $platform_id) {
+    if (!isset($variables['webshare_' . $platform_id])) {
+      $variables['webshare_' . $platform_id] = [
+        'variables' => $template_vars,
+        'template' => 'webshare-platform',
+      ];
+    }
+  }
+  
   return $variables;
 }
 

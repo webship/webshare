@@ -5,3 +5,33 @@ webshare.config_form:
     _title: 'Webshare'
   requirements:
     _permission: 'administer webshare'
+
+webshare.platform_add:
+  path: 'admin/config/services/webshare/platform/add'
+  defaults:
+    _form: '\Drupal\webshare\Form\PlatformForm'
+    _title: 'Add Platform'
+  requirements:
+    _permission: 'administer webshare'
+  options:
+    _admin_route: TRUE
+
+webshare.platform_edit:
+  path: 'admin/config/services/webshare/platform/{platform_id}/edit'
+  defaults:
+    _form: '\Drupal\webshare\Form\PlatformForm'
+    _title: 'Edit Platform'
+  requirements:
+    _permission: 'administer webshare'
+  options:
+    _admin_route: TRUE
+
+webshare.platform_delete:
+  path: 'admin/config/services/webshare/platform/{platform_id}/delete'
+  defaults:
+    _form: '\Drupal\webshare\Form\PlatformDeleteForm'
+    _title: 'Delete Platform'
+  requirements:
+    _permission: 'administer webshare'
+  options:
+    _admin_route: TRUE

@@ -1,120 +1,115 @@
 @keyframes webshare-animation-left-inactive {
     0% {
-        left:0;
+        inset-inline-start:0;
         opacity: 1;
     }
     25% {
         opacity: 0;
     }
     50% {
-        left:-22.22222rem;
+        inset-inline-start:-22.22222rem;
     }
     100% {
         opacity: 0;
-        left:-22.22222rem;
+        inset-inline-start:-22.22222rem;
     }
 }
 
 @keyframes webshare-animation-left-active {
     0% {
-        left:-22.22222rem;
+        inset-inline-start:-22.22222rem;
         opacity: 0;
     }
     50% {
-        left:0;
+        inset-inline-start:0;
     }
     75% {
         opacity: 1;
     }
     100% {
         opacity: 1;
-        left:0;
+        inset-inline-start:0;
     }
 }
 
 @keyframes webshare-animation-right-inactive {
     0% {
         opacity: 1;
-        right:0;
+        inset-inline-end:0;
     }
     25% {
         opacity: 0;
     }
     50% {
-        right:-22.22222rem;
+        inset-inline-end:-22.22222rem;
     }
     100% {
         opacity: 0;
-        right:-22.22222rem;
+        inset-inline-end:-22.22222rem;
     }
 }
 
 @keyframes webshare-animation-right-active {
     0% {
-        right:-22.22222rem;
+        inset-inline-end:-22.22222rem;
         opacity: 0;
     }
     50% {
-        right:-22.22222rem;
+        inset-inline-end:-22.22222rem;
     }
     75% {
         opacity: 1;
     }
     100% {
-        right:0;
+        inset-inline-end:0;
         opacity: 1;
     }
 }
 
 .show-menu-left {
-    right:0 !important;
+    inset-inline-end:0 !important;
   }
 
 .show-menu-right {
-    left:0 !important;
+    inset-inline-start:0 !important;
   }
 
 .block-webshare-block {
 
     position: fixed;
-    top: 11.11111rem;
-    padding-bottom: 1.11111rem;
+    inset-block-start: 11.11111rem;
+    padding-block-end: 1.11111rem;
     width: 3.05556rem !important;
-     background-color: #F3F6F8;
+     background-color: #F3F6F8
 }
 
 .block-webshare-block .block-title {
         position:absolute;
-        top: -3.88889rem;
+        inset-block-start: -3.88889rem;
         font-size: medium;
     }
 
 .block-webshare-block .block-content .webshare-container {
-            width: 100%;
+            width: 100%
         }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container {
                 box-sizing: border-box;
                 position: relative;
-                margin-left: auto;
-                margin-right: auto;
-                width: 50%;
+                margin-inline-start: auto;
+                margin-inline-end: auto;
+                width: 50%
             }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links {
                     margin: 0;
                     padding: 0;
                     list-style: none;
-                    animation-duration: 0.75s;
-                    animation-iteration-count: 1;
-                    animation-timing-function: linear;
-                    animation-direction: alternate;
-                    animation-fill-mode: forwards;
                 }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links  .webshare-link {
                         line-height: 0;
-                        margin-top: 0.72222rem;
+                        margin-block-start: 0.83333rem
                     }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links  .webshare-link img {
@@ -126,27 +121,35 @@
                                 cursor: pointer;
                         }
 
+.block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links {
+                    animation-duration: 0.75s;
+                    animation-iteration-count: 1;
+                    animation-timing-function: linear;
+                    animation-direction: alternate;
+                    animation-fill-mode: forwards;
+                }
+
 .block-webshare-block.webshare-left {
 
-        right:-3.33333rem;
+        inset-inline-end:-3.33333rem;
         transition: right 0.5s ease-out;
-    }
 
-.block-webshare-block.webshare-left .block-title {
+        .block-title {
             text-align: left;
         }
+    }
 
 .block-webshare-block.webshare-left .block-content .webshare-container {
-                float: right;
+                float: right
             }
 
 .block-webshare-block.webshare-left .block-content .webshare-container .webshare-links-container {
                     float: left;
-                    margin-left: 0.55556rem;
+                    margin-inline-start: 0.66667rem
                 }
 
 .block-webshare-block.webshare-left .block-content .webshare-container .webshare-links-container .webshare-links {
-                        text-align: left;
+                        text-align: left
                     }
 
 .block-webshare-block.webshare-left .block-content .webshare-container .webshare-links-container .webshare-links .webshare-active {
@@ -158,8 +161,8 @@
                         }
 
 .block-webshare-block.webshare-right {
-        left:-3.33333rem;
-        transition: left 0.5s ease-out;
+        inset-inline-start:-3.33333rem;
+        transition: left 0.5s ease-out
     }
 
 .block-webshare-block.webshare-right .block-title {
@@ -167,16 +170,16 @@
         }
 
 .block-webshare-block.webshare-right .block-content .webshare-container {
-                float: left;
+                float: left
             }
 
 .block-webshare-block.webshare-right .block-content .webshare-container  .webshare-links-container {
                     float: right;
-                    margin-right: 0.55556rem;
+                    margin-right: 0.66667rem
                 }
 
 .block-webshare-block.webshare-right .block-content .webshare-container  .webshare-links-container  .webshare-links {
-                        text-align: right;
+                        text-align: right
                     }
 
 .block-webshare-block.webshare-right .block-content .webshare-container  .webshare-links-container  .webshare-links .webshare-active {

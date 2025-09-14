@@ -128,6 +128,21 @@
   <rule ref="Drupal.WhiteSpace.ScopeIndent"/>
 
   <!-- Drupal Practice sniffs -->
+  <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis">
+    <!-- @todo exclude tests -->
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <properties>
+      <property name="allowUnusedFunctionParameters" value="true"/>
+    </properties>
+  </rule>
+  <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedUnsetVariable">
+    <severity>0</severity>
+  </rule>
+  <rule ref="DrupalPractice.CodeAnalysis.VariableAnalysis.UndefinedVariable">
+    <!-- Setting severity to 0 to completely disable an error message in this sniff, without excluding the whole sniff -->
+    <!-- See https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#changing-the-default-severity-levels -->
+    <severity>0</severity>
+  </rule>
   <rule ref="DrupalPractice.Commenting.ExpectedException"/>
   <rule ref="DrupalPractice.General.ExceptionT"/>
   <rule ref="DrupalPractice.InfoFiles.NamespacedDependency"/>
@@ -218,6 +233,22 @@
   <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
   <rule ref="PSR2.Namespaces.UseDeclaration"/>
 
+  <!-- SlevomatCodingStandard sniffs -->
+  <rule ref="SlevomatCodingStandard.Commenting.ForbiddenAnnotations">
+    <properties>
+      <property name="forbiddenAnnotations" type="array">
+        <element value="@inheritDoc"/>
+        <element value="@inheritdoc"/>
+      </property>
+    </properties>
+  </rule>
+  <rule ref="SlevomatCodingStandard.Commenting.ForbiddenComments">
+    <properties>
+       <property name="forbiddenCommentPatterns" type="array">
+         <element value="/@inheritDoc/"/>
+       </property>
+    </properties>
+  </rule>
 
   <!-- Squiz sniffs -->
   <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
