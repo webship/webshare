@@ -100,10 +100,11 @@ class WebshareService implements WebshareServiceInterface {
           ->execute()
           ->fetchAll();
       }
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       // If database access fails, fall back to empty array
     }
-    
+
     // Fallback to legacy config if no platforms in database
     if (empty($platforms)) {
       $share_buttons = $config->get('buttons');
@@ -144,10 +145,11 @@ class WebshareService implements WebshareServiceInterface {
         // Handle both relative and absolute paths
         if (!str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
           $image_src = $base_url . '/' . $image_src;
-        } elseif (str_starts_with($image_src, '/')) {
+        }
+        elseif (str_starts_with($image_src, '/')) {
           $image_src = $base_url . $image_src;
         }
-        
+
         $buttons[$key]['#content'] = [
           '#type' => 'html_tag',
           '#tag' => 'img',
@@ -175,13 +177,10 @@ class WebshareService implements WebshareServiceInterface {
       'alt' => $this->t($config->get('share_icon.alt')),
     ];
 
-    
-
     if ($config->get('style') == 'webshare') {
 
-    
       if ($config->get('collapsible')) {
-        
+
         $library = [
           'webshare/webshare-styles',
           'webshare/webshare-script',
@@ -202,7 +201,6 @@ class WebshareService implements WebshareServiceInterface {
       }
 
     }
-
 
     if (!empty($library)) {
       $build['#attached'] = [

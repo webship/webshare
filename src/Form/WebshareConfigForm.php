@@ -79,7 +79,7 @@ class WebshareConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#attached']['library'][] = 'webshare/webshare-admin';
-    
+
     $config = $this->config('webshare.settings');
 
     // Platform management section with horizontal tabs
@@ -88,7 +88,7 @@ class WebshareConfigForm extends ConfigFormBase {
       '#title' => $this->t('Social Media Platforms'),
       '#weight' => -10,
     ];
-    
+
     // General settings tab
     $form['general'] = [
       '#type' => 'details',
@@ -96,8 +96,7 @@ class WebshareConfigForm extends ConfigFormBase {
       '#group' => 'platforms',
       '#weight' => -5,
     ];
-    
-    
+
     $form['general']['title'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -125,31 +124,32 @@ class WebshareConfigForm extends ConfigFormBase {
       '#group' => 'platforms',
       '#weight' => 0,
     ];
-    
+
     // Get platforms from database (with error handling)
     $platforms = [];
     try {
       if ($this->database->schema()->tableExists('webshare_platforms')) {
         $platforms = $this->getPlatforms();
       }
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       // If database access fails, use empty array
       $platforms = [];
     }
-    
+
     $form['platform_management']['platforms_intro'] = [
-      '#markup' => '<div class="platforms-management-intro">' . 
-                   '<p>' . $this->t('Drag to reorder platforms, or use the operations to edit or delete them.') . '</p>' .
-                   '</div>',
+      '#markup' => '<div class="platforms-management-intro">' .
+      '<p>' . $this->t('Drag to reorder platforms, or use the operations to edit or delete them.') . '</p>' .
+      '</div>',
     ];
 
     $form['platform_management']['platforms_table'] = [
       '#type' => 'table',
       '#header' => [
-        $this->t('Platform'), 
-        $this->t('Enabled'), 
-        $this->t('Weight'), 
-        $this->t('Operations')
+        $this->t('Platform'),
+        $this->t('Enabled'),
+        $this->t('Weight'),
+        $this->t('Operations'),
       ],
       '#empty' => $this->t('No platforms configured.'),
       '#tabledrag' => [
@@ -165,7 +165,7 @@ class WebshareConfigForm extends ConfigFormBase {
       $id = $platform->platform_id;
       $form['platform_management']['platforms_table'][$id]['#attributes']['class'][] = 'draggable';
       $form['platform_management']['platforms_table'][$id]['#weight'] = $platform->weight;
-      
+
       $form['platform_management']['platforms_table'][$id]['info'] = [
         '#type' => 'container',
         '#attributes' => ['class' => ['platform-info']],
@@ -176,7 +176,7 @@ class WebshareConfigForm extends ConfigFormBase {
       $form['platform_management']['platforms_table'][$id]['info']['description'] = [
         '#markup' => '<div class="platform-description">' . $this->t($platform->title) . '</div>',
       ];
-      
+
       $form['platform_management']['platforms_table'][$id]['enabled'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Enabled'),
@@ -194,15 +194,15 @@ class WebshareConfigForm extends ConfigFormBase {
         '#attributes' => ['class' => ['platform-weight']],
         '#parents' => ['platforms_data', $id, 'weight'],
       ];
-      
+
       $operations = [];
       $operations['edit'] = [
         'title' => $this->t('Edit'),
         'url' => Url::fromRoute('webshare.platform_edit', ['platform_id' => $id]),
         'attributes' => [
-          'class' => ['use-ajax'], 
+          'class' => ['use-ajax'],
           'data-dialog-type' => 'modal',
-          'data-dialog-options' => '{"width":700,"height":600}'
+          'data-dialog-options' => '{"width":700,"height":600}',
         ],
       ];
       $operations['delete'] = [
@@ -210,19 +210,19 @@ class WebshareConfigForm extends ConfigFormBase {
         'url' => Url::fromRoute('webshare.platform_delete', ['platform_id' => $id]),
         'attributes' => ['class' => ['use-ajax'], 'data-dialog-type' => 'modal'],
       ];
-      
+
       $form['platform_management']['platforms_table'][$id]['operations'] = [
         '#type' => 'operations',
         '#links' => $operations,
       ];
     }
-    
+
     // Add new platform section
     $form['platform_management']['add_platform'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['add-platform-section']],
     ];
-    
+
     $form['platform_management']['add_platform']['add_button'] = [
       '#type' => 'link',
       '#title' => $this->t('Add Custom Platform'),
@@ -230,13 +230,13 @@ class WebshareConfigForm extends ConfigFormBase {
       '#attributes' => [
         'class' => ['button', 'button--primary', 'use-ajax'],
         'data-dialog-type' => 'modal',
-        'data-dialog-options' => '{"width":700,"height":600}'
+        'data-dialog-options' => '{"width":700,"height":600}',
       ],
     ];
     $form['general']['display_intro'] = [
-      '#markup' => '<div class="display-settings-intro">' . 
-                   '<p>' . $this->t('Configure how and where the sharing buttons appear on your site.') . '</p>' .
-                   '</div>',
+      '#markup' => '<div class="display-settings-intro">' .
+      '<p>' . $this->t('Configure how and where the sharing buttons appear on your site.') . '</p>' .
+      '</div>',
     ];
     $form['general']['style'] = [
       '#type' => 'radios',
@@ -263,7 +263,7 @@ class WebshareConfigForm extends ConfigFormBase {
         ],
       ],
     ];
-    
+
     $form['general']['alignment'] = [
       '#type' => 'radios',
       '#title' => $this->t('Alignment'),
@@ -278,7 +278,6 @@ class WebshareConfigForm extends ConfigFormBase {
     return parent::buildForm($form, $form_state);
   }
 
-
   /**
    * Get platforms from database.
    */
@@ -291,7 +290,8 @@ class WebshareConfigForm extends ConfigFormBase {
         ->orderBy('name')
         ->execute()
         ->fetchAll();
-    } catch (\Exception $e) {
+    }
+    catch (\Exception $e) {
       return [];
     }
   }
@@ -324,7 +324,6 @@ class WebshareConfigForm extends ConfigFormBase {
       ->set('include_js', $form_values['libraries']['include_js'])
       ->set('alignment', $form_values['alignment'])
       ->save();
-
 
     $this->renderCache->deleteAll();
     parent::submitForm($form, $form_state);

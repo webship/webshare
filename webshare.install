@@ -110,7 +110,7 @@ function webshare_install() {
 function _webshare_migrate_default_platforms() {
   $config = \Drupal::config('webshare.settings');
   $buttons = $config->get('buttons');
-  
+
   if (empty($buttons)) {
     return;
   }
@@ -128,7 +128,7 @@ function _webshare_migrate_default_platforms() {
     if ($platform_id === 'facebook_like') {
       continue;
     }
-    
+
     $database->insert('webshare_platforms')
       ->fields([
         'platform_id' => $platform_id,
@@ -152,7 +152,7 @@ function _webshare_migrate_default_platforms() {
 function webshare_update_8001() {
   $schema = webshare_schema();
   $schema_handler = \Drupal::database()->schema();
-  
+
   if (!$schema_handler->tableExists('webshare_platforms')) {
     $schema_handler->createTable('webshare_platforms', $schema['webshare_platforms']);
     _webshare_migrate_default_platforms();
