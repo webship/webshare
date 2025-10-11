@@ -7,9 +7,12 @@ use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Datetime\TimeInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\File\FileExists;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,16 +37,36 @@ class PlatformForm extends FormBase {
   protected $fileSystem;
 
   /**
+   * The module extension list service.
+   *
+   * @var \Drupal\Core\Extension\ModuleExtensionList
+   */
+  protected $moduleExtensionList;
+
+  /**
+   * The time service.
+   *
+   * @var \Drupal\Core\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * Constructs a new PlatformForm object.
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system service.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
+   *   The module extension list service.
+   * @param \Drupal\Core\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct(Connection $database, FileSystemInterface $file_system) {
+  public function __construct(Connection $database, FileSystemInterface $file_system, ModuleExtensionList $module_extension_list, TimeInterface $time) {
     $this->database = $database;
     $this->fileSystem = $file_system;
+    $this->moduleExtensionList = $module_extension_list;
+    $this->time = $time;
   }
 
   /**
@@ -52,7 +75,9 @@ class PlatformForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
         $container->get('database'),
-        $container->get('file_system')
+        $container->get('file_system'),
+        $container->get('extension.list.module'),
+        $container->get('datetime.time')
     );
   }
 
@@ -229,11 +254,11 @@ class PlatformForm extends FormBase {
 
           // Get the original filename and extension
           $filename = $file->getFilename();
-          $module_path = \Drupal::service('extension.list.module')->getPath('webshare');
+          $module_path = $this->moduleExtensionList->getPath('webshare');
           $module_img_path = DRUPAL_ROOT . '/' . $module_path . '/img/' . $filename;
 
           // Copy file to module img folder
-          $this->fileSystem->copy($file_uri, $module_img_path, FileSystemInterface::EXISTS_REPLACE);
+          $this->fileSystem->copy($file_uri, $module_img_path, FileExists::Replace);
 
           // Store relative path from module root
           $image_path = $module_path . '/img/' . $filename;
@@ -251,7 +276,7 @@ class PlatformForm extends FormBase {
       ->execute()
       ->fetchObject();
 
-    $time = \Drupal::time()->getRequestTime();
+    $time = $this->time->getRequestTime();
 
     if ($existing) {
       // Update existing platform
