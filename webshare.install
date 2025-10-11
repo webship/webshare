@@ -10,76 +10,77 @@ use Drupal\Core\Database\Database;
 /**
  * Implements hook_schema().
  */
-function webshare_schema() {
-  $schema = [];
+function webshare_schema()
+{
+    $schema = [];
 
-  $schema['webshare_platforms'] = [
+    $schema['webshare_platforms'] = [
     'description' => 'Table for storing social media platform configurations.',
     'fields' => [
       'id' => [
         'type' => 'serial',
-        'not null' => TRUE,
+        'not null' => true,
         'description' => 'Primary Key: Unique platform ID.',
       ],
       'platform_id' => [
         'type' => 'varchar',
         'length' => 64,
-        'not null' => TRUE,
+        'not null' => true,
         'description' => 'Machine name for the platform.',
       ],
       'name' => [
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
+        'not null' => true,
         'description' => 'Human readable name of the platform.',
       ],
       'title' => [
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
+        'not null' => true,
         'description' => 'Title shown on hover.',
       ],
       'enabled' => [
         'type' => 'int',
         'size' => 'tiny',
-        'not null' => TRUE,
+        'not null' => true,
         'default' => 1,
         'description' => 'Whether the platform is enabled.',
       ],
       'image' => [
         'type' => 'varchar',
         'length' => 255,
-        'not null' => TRUE,
+        'not null' => true,
         'description' => 'Path to the platform icon.',
       ],
       'weight' => [
         'type' => 'int',
-        'not null' => TRUE,
+        'not null' => true,
         'default' => 0,
         'description' => 'Weight for ordering platforms.',
       ],
       'url_template' => [
         'type' => 'varchar',
         'length' => 512,
-        'not null' => FALSE,
+        'not null' => false,
         'description' => 'URL template for sharing.',
       ],
       'is_custom' => [
         'type' => 'int',
         'size' => 'tiny',
-        'not null' => TRUE,
+        'not null' => true,
         'default' => 0,
         'description' => 'Whether this is a custom platform added by admin.',
       ],
       'created' => [
         'type' => 'int',
-        'not null' => TRUE,
+        'not null' => true,
         'default' => 0,
         'description' => 'Timestamp when the platform was created.',
       ],
       'updated' => [
         'type' => 'int',
-        'not null' => TRUE,
+        'not null' => true,
         'default' => 0,
         'description' => 'Timestamp when the platform was last updated.',
       ],
@@ -91,46 +92,48 @@ function webshare_schema() {
     'indexes' => [
       'enabled_weight' => ['enabled', 'weight'],
     ],
-  ];
+    ];
 
-  return $schema;
+    return $schema;
 }
 
 /**
  * Implements hook_install().
  */
-function webshare_install() {
+function webshare_install()
+{
   // Migrate existing configuration to database.
-  _webshare_migrate_default_platforms();
+    _webshare_migrate_default_platforms();
 }
 
 /**
  * Helper function to migrate default platforms to database.
  */
-function _webshare_migrate_default_platforms() {
-  $config = \Drupal::config('webshare.settings');
-  $buttons = $config->get('buttons');
+function _webshare_migrate_default_platforms()
+{
+    $config = \Drupal::config('webshare.settings');
+    $buttons = $config->get('buttons');
 
   if (empty($buttons)) {
-    return;
+      return;
   }
 
-  $database = Database::getConnection();
-  $default_templates = [
+    $database = Database::getConnection();
+    $default_templates = [
     'facebook_share' => 'https://www.facebook.com/sharer/sharer.php?u=[url]',
     'x' => 'https://twitter.com/intent/tweet?url=[url]&text=[title]',
     'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=[url]',
     'whatsapp' => 'https://api.whatsapp.com/send?text=[title]%20[url]',
     'copy' => '',
-  ];
+    ];
 
-  foreach ($buttons as $platform_id => $button) {
-    if ($platform_id === 'facebook_like') {
-      continue;
-    }
+    foreach ($buttons as $platform_id => $button) {
+      if ($platform_id === 'facebook_like') {
+          continue;
+      }
 
-    $database->insert('webshare_platforms')
-      ->fields([
+        $database->insert('webshare_platforms')
+        ->fields([
         'platform_id' => $platform_id,
         'name' => $button['name'],
         'title' => $button['title'] ?? $button['name'],
@@ -141,20 +144,21 @@ function _webshare_migrate_default_platforms() {
         'is_custom' => 0,
         'created' => \Drupal::time()->getRequestTime(),
         'updated' => \Drupal::time()->getRequestTime(),
-      ])
-      ->execute();
-  }
+        ])
+        ->execute();
+    }
 }
 
 /**
  * Create webshare_platforms table and migrate existing data.
  */
-function webshare_update_8001() {
-  $schema = webshare_schema();
-  $schema_handler = \Drupal::database()->schema();
+function webshare_update_8001()
+{
+    $schema = webshare_schema();
+    $schema_handler = \Drupal::database()->schema();
 
   if (!$schema_handler->tableExists('webshare_platforms')) {
-    $schema_handler->createTable('webshare_platforms', $schema['webshare_platforms']);
-    _webshare_migrate_default_platforms();
+      $schema_handler->createTable('webshare_platforms', $schema['webshare_platforms']);
+      _webshare_migrate_default_platforms();
   }
 }

@@ -23,17 +23,17 @@
 
 /* Setup guide styling */
 .webshare-setup-guide {
-  background: var(--webshare-bg-light);
+  margin-bottom: var(--webshare-spacing);
+  padding: var(--webshare-spacing);
   border: 1px solid var(--webshare-border);
   border-radius: var(--webshare-border-radius);
-  padding: var(--webshare-spacing);
-  margin-bottom: var(--webshare-spacing);
+  background: var(--webshare-bg-light);
 }
 
 .setup-guide-intro {
   h3 {
-    color: var(--webshare-primary);
     margin-top: 0;
+    color: var(--webshare-primary);
     font-size: 1.2em;
     font-weight: 600;
   }
@@ -47,10 +47,10 @@
 
 /* Platform management styling */
 .platforms-management-intro {
-  background: var(--webshare-bg-blue);
-  border-left: 4px solid var(--webshare-primary);
-  padding: var(--webshare-spacing-sm);
   margin-bottom: var(--webshare-spacing);
+  padding: var(--webshare-spacing-sm);
+  border-left: 4px solid var(--webshare-primary);
+  background: var(--webshare-bg-blue);
 
   p {
     margin: 0;
@@ -59,10 +59,10 @@
 }
 
 .display-settings-intro {
-  background: var(--webshare-bg-purple);
-  border-left: 4px solid var(--webshare-secondary);
-  padding: var(--webshare-spacing-sm);
   margin-bottom: var(--webshare-spacing);
+  padding: var(--webshare-spacing-sm);
+  border-left: 4px solid var(--webshare-secondary);
+  background: var(--webshare-bg-purple);
 
   p {
     margin: 0;
@@ -76,40 +76,40 @@
 
   strong {
     display: block;
+    margin-bottom: 4px;
     color: var(--webshare-text);
     font-size: 1.1em;
-    margin-bottom: 4px;
   }
 }
 
 .platform-description {
-  font-size: 0.9em;
   color: var(--webshare-text-light);
+  font-size: 0.9em;
   font-style: italic;
 }
 
 /* Add platform section */
 .add-platform-section {
-  border-top: 2px solid #e9ecef;
-  padding-top: var(--webshare-spacing);
   margin-top: var(--webshare-spacing);
+  padding-top: var(--webshare-spacing);
   text-align: center;
+  border-top: 2px solid #e9ecef;
 
   .button--primary {
-    background-color: var(--webshare-primary);
-    border-color: var(--webshare-primary);
-    color: white;
-    padding: 10px 20px;
-    font-weight: 600;
-    text-decoration: none;
     display: inline-block;
-    border-radius: 4px;
+    padding: 10px 20px;
     transition: var(--webshare-transition);
+    text-decoration: none;
+    color: white;
+    border-color: var(--webshare-primary);
+    border-radius: 4px;
+    background-color: var(--webshare-primary);
+    font-weight: 600;
 
     &:hover {
-      background-color: var(--webshare-primary-dark);
-      color: white;
       text-decoration: none;
+      color: white;
+      background-color: var(--webshare-primary-dark);
     }
   }
 }
@@ -123,28 +123,28 @@
     margin-bottom: 1em;
 
     label {
-      font-weight: 600;
       color: var(--webshare-text);
+      font-weight: 600;
     }
   }
 
   .description {
-    font-size: 0.9em;
-    color: var(--webshare-text-light);
     margin-top: 0.25em;
+    color: var(--webshare-text-light);
+    font-size: 0.9em;
   }
 }
 
 /* Vertical tabs enhancement */
 .vertical-tabs {
+  overflow: hidden;
   border: 1px solid var(--webshare-border);
   border-radius: var(--webshare-border-radius);
-  overflow: hidden;
 }
 
 .vertical-tabs__menu {
-  background: var(--webshare-bg-light);
   border-right: 1px solid var(--webshare-border);
+  background: var(--webshare-bg-light);
 }
 
 .vertical-tabs__menu-item {
@@ -157,20 +157,20 @@
 
 .vertical-tabs__menu-item-link {
   padding: var(--webshare-spacing-sm) var(--webshare-spacing);
+  transition: var(--webshare-transition);
   color: #495057;
   font-weight: 500;
-  transition: var(--webshare-transition);
 
   &:hover {
-    background-color: #e9ecef;
-    color: var(--webshare-primary);
     text-decoration: none;
+    color: var(--webshare-primary);
+    background-color: #e9ecef;
   }
 
   &.is-selected {
-    background-color: var(--webshare-primary);
     color: white;
     border-left: 4px solid var(--webshare-primary-dark);
+    background-color: var(--webshare-primary);
   }
 }
 
@@ -215,13 +215,13 @@
 
   .dropbutton-action a {
     padding: 6px 12px;
+    transition: var(--webshare-transition);
     color: var(--webshare-primary);
     font-size: 0.9em;
-    transition: var(--webshare-transition);
 
     &:hover {
-      background-color: var(--webshare-bg-light);
       text-decoration: none;
+      background-color: var(--webshare-bg-light);
     }
   }
 }
@@ -229,21 +229,21 @@
 /* Success/error message styling */
 .messages {
   &--status {
-    background-color: #d4edda;
-    border-color: #c3e6cb;
     color: #155724;
+    border-color: #c3e6cb;
+    background-color: #d4edda;
   }
 
   &--error {
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
     color: #721c24;
+    border-color: #f5c6cb;
+    background-color: #f8d7da;
   }
 
   &--warning {
-    background-color: #fff3cd;
-    border-color: #ffecb5;
     color: #856404;
+    border-color: #ffecb5;
+    background-color: #fff3cd;
   }
 }
 

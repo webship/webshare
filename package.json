@@ -8,20 +8,14 @@
     "node": ">= 20.0"
   },
   "scripts": {
-    "build": "node scripts/css/postcss-build.js",
-    "build:css": "node scripts/css/postcss-build.js",
-    "watch": "node scripts/css/postcss-watch.js",
-    "watch:css": "node scripts/css/postcss-watch.js",
-    "lint": "yarn lint:js && yarn lint:css && yarn lint:yaml",
-    "lint:js": "eslint js/ --config=.eslintrc.json",
-    "lint:css": "stylelint css/**/*.css --config=.stylelintrc.json",
-    "lint:css-fix": "stylelint css/**/*.css --config=.stylelintrc.json --fix",
-    "lint:yaml": "eslint **/*.yml --config=.eslintrc.json",
-    "lint:php": "phpcs --standard=./.phpcs.xml .",
-    "fix:php": "phpcbf --standard=./.phpcs.xml .",
-    "fix:js": "eslint js/ --config=.eslintrc.json --fix",
-    "format": "prettier --write \"**/*.{js,yml,yaml,json}\" --ignore-path .gitignore",
-    "test": "yarn lint && yarn build"
+    "theme:build": "yarn theme:build:admin",
+    "phpcs": "phpcs --standard=./.phpcs.xml .",
+    "phpcbf": "phpcbf --standard=./.phpcs.xml .",
+    "lint:js": "eslint --ext .js .",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint:yaml": "eslint --ext .yml .",
+    "spellcheck": "cspell lint ."
+
   },
   "devDependencies": {
     "chalk": "^5.3.0",

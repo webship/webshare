@@ -5,7 +5,8 @@ namespace Drupal\webshare;
 /**
  * Interface for WebshareService.
  */
-interface WebshareServiceInterface {
+interface WebshareServiceInterface
+{
 
   /**
    * Builds a renderable array of Social buttons.
@@ -30,5 +31,4 @@ interface WebshareServiceInterface {
    *   Returns TRUE or FALSE.
    */
   public function isRestricted($view_mode);
-
 }

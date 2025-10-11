@@ -75,12 +75,11 @@
   }
 
 .block-webshare-block {
-
     position: fixed;
-    inset-block-start: 11.11111rem;
-    padding-block-end: 1.11111rem;
     width: 3.05556rem !important;
-     background-color: #F3F6F8
+    padding-block-end: 1.11111rem;
+     background-color: #F3F6F8;
+    inset-block-start: 11.11111rem
 }
 
 .block-webshare-block .block-title {
@@ -94,11 +93,11 @@
         }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container {
-                box-sizing: border-box;
                 position: relative;
+                box-sizing: border-box;
+                width: 50%;
                 margin-inline-start: auto;
-                margin-inline-end: auto;
-                width: 50%
+                margin-inline-end: auto
             }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links {
@@ -108,8 +107,8 @@
                 }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links  .webshare-link {
-                        line-height: 0;
-                        margin-block-start: 0.83333rem
+                        margin-block-start: 0.83333rem;
+                        line-height: 0
                     }
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links  .webshare-link img {
@@ -123,14 +122,13 @@
 
 .block-webshare-block .block-content .webshare-container .webshare-links-container .webshare-links {
                     animation-duration: 0.75s;
-                    animation-iteration-count: 1;
                     animation-timing-function: linear;
+                    animation-iteration-count: 1;
                     animation-direction: alternate;
                     animation-fill-mode: forwards;
                 }
 
 .block-webshare-block.webshare-left {
-
         inset-inline-end:-3.33333rem;
         transition: right 0.5s ease-out;
 

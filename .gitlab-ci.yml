@@ -21,8 +21,8 @@ eslint:
     - corepack enable
     - yarn install
   script:
-    - yarn lint:js --fix || true
-    - yarn lint:yaml --fix || true
+    - yarn lint:js || true
+    - yarn lint:yaml || true
   after_script:
     - touch junit.xml _eslint.patch
   allow_failure: true
@@ -34,7 +34,7 @@ stylelint:
     - corepack enable
     - yarn install
   script:
-    - yarn lint:css --fix || true
+    - yarn lint:css || true
   after_script:
     - echo '[]' > gl-codequality.json
   allow_failure: true

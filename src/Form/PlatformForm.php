@@ -51,8 +51,8 @@ class PlatformForm extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database'),
-      $container->get('file_system')
+        $container->get('database'),
+        $container->get('file_system')
     );
   }
 
@@ -238,8 +238,7 @@ class PlatformForm extends FormBase {
           // Store relative path from module root
           $image_path = $module_path . '/img/' . $filename;
         }
-      }
-      catch (\Exception $e) {
+      } catch (\Exception $e) {
         $form_state->setError($form['icon'], $this->t('Error processing uploaded file: @message', ['@message' => $e->getMessage()]));
         return;
       }
@@ -275,8 +274,7 @@ class PlatformForm extends FormBase {
         ->execute();
 
       $this->messenger()->addMessage($this->t('Platform %name has been updated.', ['%name' => $values['name']]));
-    }
-    else {
+    } else {
       // Insert new platform - validation already handled in validateForm()
       $this->database->insert('webshare_platforms')
         ->fields([
@@ -305,8 +303,7 @@ class PlatformForm extends FormBase {
 
     if ($form_state->hasAnyErrors()) {
       $response->addCommand(new ReplaceCommand('#webshare-platform-form', $form));
-    }
-    else {
+    } else {
       $response->addCommand(new CloseDialogCommand());
       $response->addCommand(new RedirectCommand(Url::fromRoute('webshare.config_form')->toString()));
     }
@@ -322,5 +319,4 @@ class PlatformForm extends FormBase {
     $response->addCommand(new CloseDialogCommand());
     return $response;
   }
-
 }

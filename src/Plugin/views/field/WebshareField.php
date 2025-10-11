@@ -14,14 +14,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ViewsField("webshare_field")
  */
-class WebshareField extends FieldPluginBase {
+class WebshareField extends FieldPluginBase
+{
 
   /**
    * The WebShare service.
    *
    * @var \Drupal\webshare\WebshareService
    */
-  protected $shareService;
+    protected $shareService;
 
   /**
    * Constructs a WebshareField object.
@@ -35,40 +36,43 @@ class WebshareField extends FieldPluginBase {
    * @param \Drupal\webshare\WebshareServiceInterface $share_service
    *   The module manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, WebshareServiceInterface $share_service) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->shareService = $share_service;
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, WebshareServiceInterface $share_service)
+  {
+      parent::__construct($configuration, $plugin_id, $plugin_definition);
+      $this->shareService = $share_service;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('webshare.service')
-    );
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+  {
+      return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('webshare.service')
+      );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function query() {
-    $this->ensureMyTable();
-    $this->addAdditionalFields();
+  public function query()
+  {
+      $this->ensureMyTable();
+      $this->addAdditionalFields();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function render(ResultRow $values) {
-    $node = $values->_entity;
-    $url = $node->toUrl()->setAbsolute()->toString();
-    $id = $node->getEntityTypeId() . $node->id();
+  public function render(ResultRow $values)
+  {
+      $node = $values->_entity;
+      $url = $node->toUrl()->setAbsolute()->toString();
+      $id = $node->getEntityTypeId() . $node->id();
 
-    return $this->shareService->build($url, $id);
+      return $this->shareService->build($url, $id);
   }
-
 }

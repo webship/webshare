@@ -17,21 +17,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   admin_label = @Translation("Webshare Block"),
  * )
  */
-class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface {
+class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface
+{
 
   /**
    * The WebShare service.
    *
    * @var \Drupal\webshare\WebshareServiceInterface
    */
-  protected $shareService;
+    protected $shareService;
 
   /**
    * The path alias manager.
    *
    * @var \Drupal\path_alias\AliasManagerInterface
    */
-  protected $aliasManager;
+    protected $aliasManager;
 
   /**
    * Constructs an WebshareBlock object.
@@ -47,33 +48,35 @@ class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *   The path alias manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, WebshareServiceInterface $share_service, AliasManagerInterface $alias_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->shareService = $share_service;
-    $this->aliasManager = $alias_manager;
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, WebshareServiceInterface $share_service, AliasManagerInterface $alias_manager)
+  {
+      parent::__construct($configuration, $plugin_id, $plugin_definition);
+      $this->shareService = $share_service;
+      $this->aliasManager = $alias_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('webshare.service'),
-      $container->get('path_alias.manager')
-    );
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+  {
+      return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->get('webshare.service'),
+          $container->get('path_alias.manager')
+      );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build() {
-    $url = Url::fromRoute('<current>');
-    $id = str_replace('/', '', $this->aliasManager->getPathByAlias($url->toString()));
+  public function build()
+  {
+      $url = Url::fromRoute('<current>');
+      $id = str_replace('/', '', $this->aliasManager->getPathByAlias($url->toString()));
 
-    return $this->shareService->build($url->setAbsolute()->toString(), $id);
+      return $this->shareService->build($url->setAbsolute()->toString(), $id);
   }
-
 }

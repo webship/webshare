@@ -23,16 +23,16 @@
 
 /* Setup guide styling */
 .webshare-setup-guide {
-  background: #f8f9fa;
+  margin-bottom: 20px;
+  padding: 20px;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  background: #f8f9fa;
 }
 
 .setup-guide-intro h3 {
-  color: #007cba;
   margin-top: 0;
+  color: #007cba;
   font-size: 1.2em;
   font-weight: 600;
 }
@@ -45,10 +45,10 @@
 
 /* Platform management styling */
 .platforms-management-intro {
-  background: #e3f2fd;
-  border-left: 4px solid #007cba;
-  padding: 15px;
   margin-bottom: 20px;
+  padding: 15px;
+  border-left: 4px solid #007cba;
+  background: #e3f2fd;
 }
 
 .platforms-management-intro p {
@@ -57,10 +57,10 @@
 }
 
 .display-settings-intro {
-  background: #f3e5f5;
-  border-left: 4px solid #9c27b0;
-  padding: 15px;
   margin-bottom: 20px;
+  padding: 15px;
+  border-left: 4px solid #9c27b0;
+  background: #f3e5f5;
 }
 
 .display-settings-intro p {
@@ -75,41 +75,41 @@
 
 .platform-info strong {
   display: block;
+  margin-bottom: 4px;
   color: #333;
   font-size: 1.1em;
-  margin-bottom: 4px;
 }
 
 .platform-description {
-  font-size: 0.9em;
   color: #666;
+  font-size: 0.9em;
   font-style: italic;
 }
 
 /* Add platform section */
 .add-platform-section {
-  border-top: 2px solid #e9ecef;
-  padding-top: 20px;
   margin-top: 20px;
+  padding-top: 20px;
   text-align: center;
+  border-top: 2px solid #e9ecef;
 }
 
 .add-platform-section .button--primary {
-  background-color: #007cba;
-  border-color: #007cba;
-  color: white;
-  padding: 10px 20px;
-  font-weight: 600;
-  text-decoration: none;
   display: inline-block;
-  border-radius: 4px;
+  padding: 10px 20px;
   transition: all 0.2s ease;
+  text-decoration: none;
+  color: white;
+  border-color: #007cba;
+  border-radius: 4px;
+  background-color: #007cba;
+  font-weight: 600;
 }
 
 .add-platform-section .button--primary:hover {
-  background-color: #005177;
-  color: white;
   text-decoration: none;
+  color: white;
+  background-color: #005177;
 }
 
 /* Modal form styling */
@@ -123,26 +123,26 @@
 }
 
 .webshare-platform-form .form-item label {
-  font-weight: 600;
   color: #333;
+  font-weight: 600;
 }
 
 .webshare-platform-form .description {
-  font-size: 0.9em;
-  color: #666;
   margin-top: 0.25em;
+  color: #666;
+  font-size: 0.9em;
 }
 
 /* Vertical tabs enhancement */
 .vertical-tabs {
+  overflow: hidden;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .vertical-tabs__menu {
-  background: #f8f9fa;
   border-right: 1px solid #dee2e6;
+  background: #f8f9fa;
 }
 
 .vertical-tabs__menu-item {
@@ -155,21 +155,21 @@
 
 .vertical-tabs__menu-item-link {
   padding: 15px 20px;
+  transition: all 0.2s ease;
   color: #495057;
   font-weight: 500;
-  transition: all 0.2s ease;
 }
 
 .vertical-tabs__menu-item-link:hover {
-  background-color: #e9ecef;
-  color: #007cba;
   text-decoration: none;
+  color: #007cba;
+  background-color: #e9ecef;
 }
 
 .vertical-tabs__menu-item-link.is-selected {
-  background-color: #007cba;
   color: white;
   border-left: 4px solid #005177;
+  background-color: #007cba;
 }
 
 .vertical-tabs__panes {
@@ -210,14 +210,14 @@
 
 .dropbutton .dropbutton-action a {
   padding: 6px 12px;
+  transition: all 0.2s ease;
   color: #007cba;
   font-size: 0.9em;
-  transition: all 0.2s ease;
 }
 
 .dropbutton .dropbutton-action a:hover {
-  background-color: #f8f9fa;
   text-decoration: none;
+  background-color: #f8f9fa;
 }
 
 /* Responsive design */
@@ -241,19 +241,19 @@
 
 /* Success/error message styling */
 .messages--status {
-  background-color: #d4edda;
-  border-color: #c3e6cb;
   color: #155724;
+  border-color: #c3e6cb;
+  background-color: #d4edda;
 }
 
 .messages--error {
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
   color: #721c24;
+  border-color: #f5c6cb;
+  background-color: #f8d7da;
 }
 
 .messages--warning {
-  background-color: #fff3cd;
-  border-color: #ffecb5;
   color: #856404;
+  border-color: #ffecb5;
+  background-color: #fff3cd;
 }

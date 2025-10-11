@@ -12,7 +12,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * Defines a WebshareService service.
  */
 class WebshareService implements WebshareServiceInterface {
-
   use StringTranslationTrait;
 
   /**
@@ -78,13 +77,13 @@ class WebshareService implements WebshareServiceInterface {
         $build['#attributes']['class'] = [
           'webshare-left',
         ];
-        break;
+          break;
 
       case 'right':
         $build['#attributes']['class'] = [
           'webshare-right',
         ];
-        break;
+          break;
     }
 
     // Get enabled platforms from database (fallback to config if table doesn't exist)
@@ -100,8 +99,7 @@ class WebshareService implements WebshareServiceInterface {
           ->execute()
           ->fetchAll();
       }
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
       // If database access fails, fall back to empty array
     }
 
@@ -145,8 +143,7 @@ class WebshareService implements WebshareServiceInterface {
         // Handle both relative and absolute paths
         if (!str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
           $image_src = $base_url . '/' . $image_src;
-        }
-        elseif (str_starts_with($image_src, '/')) {
+        } elseif (str_starts_with($image_src, '/')) {
           $image_src = $base_url . $image_src;
         }
 
@@ -159,8 +156,7 @@ class WebshareService implements WebshareServiceInterface {
             'alt' => $this->t($platform->title),
           ],
         ];
-      }
-      elseif ($config->get('style') == 'custom') {
+      } elseif ($config->get('style') == 'custom') {
         $buttons[$key]['#content'] = $this->t($platform->name);
       }
     }
@@ -178,28 +174,23 @@ class WebshareService implements WebshareServiceInterface {
     ];
 
     if ($config->get('style') == 'webshare') {
-
       if ($config->get('collapsible')) {
-
+        $library = [
+          'webshare/webshare-styles',
+          'webshare/webshare-script',
+        ];
+      } else {
         $library = [
           'webshare/webshare-styles',
           'webshare/webshare-script',
         ];
       }
-      else {
-        $library = [
-          'webshare/webshare-styles',
-          'webshare/webshare-script',
-        ];
-      }
-    }
-    elseif ($config->get('style') == 'custom') {
+    } elseif ($config->get('style') == 'custom') {
       if ($config->get('include_css')) {
         $library = [
           'webshare/webshare-styles',
         ];
       }
-
     }
 
     if (!empty($library)) {
@@ -221,7 +212,7 @@ class WebshareService implements WebshareServiceInterface {
       case 'search_result':
       case 'search_index':
       case 'rss':
-        return TRUE;
+          return TRUE;
     }
 
     $restricted_pages = $config->get('restricted_pages.pages');
@@ -259,5 +250,4 @@ class WebshareService implements WebshareServiceInterface {
     ];
     return $templates[$platform_id] ?? '';
   }
-
 }

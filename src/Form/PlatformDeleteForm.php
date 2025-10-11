@@ -42,7 +42,7 @@ class PlatformDeleteForm extends ConfirmFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database')
+        $container->get('database')
     );
   }
 
@@ -80,8 +80,10 @@ class PlatformDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete the %name platform?',
-      ['%name' => $this->platform->name]);
+    return $this->t(
+        'Are you sure you want to delete the %name platform?',
+        ['%name' => $this->platform->name]
+    );
   }
 
   /**
@@ -113,10 +115,11 @@ class PlatformDeleteForm extends ConfirmFormBase {
       ->condition('platform_id', $this->platform->platform_id)
       ->execute();
 
-    $this->messenger()->addMessage($this->t('Platform %name has been deleted.',
-      ['%name' => $this->platform->name]));
+    $this->messenger()->addMessage($this->t(
+        'Platform %name has been deleted.',
+        ['%name' => $this->platform->name]
+    ));
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
-
 }
