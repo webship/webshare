@@ -1,0 +1,16 @@
+includes:
+  - vendor/mglaman/phpstan-drupal/extension.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+  level: 1
+  paths:
+    - src
+  excludePaths:
+    - */tests/*
+  scanDirectories:
+    - web/core
+    - web/modules
+    - web/profiles
+  bootstrapFiles:
+    - vendor/autoload.php
