@@ -3,3 +3,8 @@ services:
     class: Drupal\webshare\WebshareService
     factory: ['Drupal\webshare\WebshareService', 'create']
     arguments: ['@service_container']
+  webshare.twig_extension:
+    class: Drupal\webshare\TwigExtension\WebshareTwigExtension
+    arguments: ['@webshare.service']
+    tags:
+      - { name: twig.extension }
