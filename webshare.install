@@ -121,10 +121,18 @@ function _webshare_migrate_default_platforms()
     $database = Database::getConnection();
     $default_templates = [
     'facebook_share' => 'https://www.facebook.com/sharer/sharer.php?u=[url]',
-    'x' => 'https://twitter.com/intent/tweet?url=[url]&text=[title]',
-    'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=[url]',
-    'whatsapp' => 'https://api.whatsapp.com/send?text=[title]%20[url]',
-    'copy' => '',
+    'x'              => 'https://twitter.com/intent/tweet?url=[url]&text=[title]',
+    'linkedin'       => 'https://www.linkedin.com/sharing/share-offsite/?url=[url]',
+    'whatsapp'       => 'https://api.whatsapp.com/send?text=[title]%20[url]',
+    'copy'           => '',
+    'email'          => 'mailto:?subject=[title]&body=[url]',
+    'telegram'       => 'https://t.me/share/url?url=[url]&text=[title]',
+    'reddit'         => 'https://www.reddit.com/submit?url=[url]&title=[title]',
+    'pinterest'      => 'https://www.pinterest.com/pin/create/button/?url=[url]&description=[title]',
+    'threads'        => 'https://www.threads.net/intent/post?text=[title]%20[url]',
+    'bluesky'        => 'https://bsky.app/intent/compose?text=[title]%20[url]',
+    'tumblr'         => 'https://www.tumblr.com/share/link?url=[url]&name=[title]',
+    'mastodon'       => 'https://mastodonshare.com/?url=[url]&text=[title]',
     ];
 
     foreach ($buttons as $platform_id => $button) {
@@ -162,3 +170,79 @@ function webshare_update_8001()
       _webshare_migrate_default_platforms();
   }
 }
+
+/**
+ * Reorder default platforms to match the approved design (LinkedIn, Facebook, X).
+ */
+function webshare_update_8002()
+{
+    $database = Database::getConnection();
+
+  if (!$database->schema()->tableExists('webshare_platforms')) {
+      return;
+  }
+
+  // New default weights for the non-custom platforms. Custom platforms keep
+  // their existing weight so admins do not lose a manual ordering.
+    $default_weights = [
+    'linkedin' => 0,
+    'facebook_share' => 1,
+    'x' => 2,
+    'whatsapp' => 3,
+    'copy' => 4,
+    ];
+
+    foreach ($default_weights as $platform_id => $weight) {
+      $database->update('webshare_platforms')
+        ->fields(['weight' => $weight])
+        ->condition('platform_id', $platform_id)
+        ->condition('is_custom', 0)
+        ->execute();
+    }
+}
+
+/**
+ * Replace `left` / `right` alignment with logical `start` / `end` values.
+ */
+function webshare_update_8003()
+{
+    $config = \Drupal::configFactory()->getEditable('webshare.settings');
+    $current = $config->get('alignment');
+    $map = ['left' => 'start', 'right' => 'end'];
+  if (isset($map[$current])) {
+      $config->set('alignment', $map[$current])->save();
+      return t('Migrated webshare alignment from @from to @to.', [
+        '@from' => $current,
+        '@to' => $map[$current],
+      ]);
+  }
+    return t('Webshare alignment already uses logical values.');
+}
+
+/**
+ * Initialise empty icon_map + native_share_icon keys (Icons API integration).
+ *
+ * The module is icon-library agnostic, so no defaults are seeded here.
+ * Site builders pick a pack (bootstrap_icons, phosphor, font-awesome,
+ * material_symbols, etc.) by overriding webshare.settings.icon_map and
+ * webshare.settings.native_share_icon. Vartheme BS5 ships a Varbase
+ * preset that wires the bootstrap_icons pack on Varbase sites.
+ */
+function webshare_update_8004() {
+    $config = \Drupal::configFactory()->getEditable('webshare.settings');
+    $changed = FALSE;
+  if ($config->get('icon_map') === NULL) {
+      $config->set('icon_map', []);
+      $changed = TRUE;
+  }
+  if ($config->get('native_share_icon') === NULL) {
+      $config->set('native_share_icon', []);
+      $changed = TRUE;
+  }
+  if ($changed) {
+      $config->save();
+      return t('Webshare Icons API config keys initialised.');
+  }
+    return t('Webshare Icons API config keys already present.');
+}
+

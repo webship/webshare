@@ -1,0 +1,95 @@
+{#
+/**
+ * @file
+ * Webshare Sharing single-directory component.
+ *
+ * Renders the social sharing buttons wrapper. Supports a native Web Share API
+ * button, horizontal / vertical orientation, and mobile visibility control.
+ *
+ * Props:
+ *  - url: Absolute URL being shared.
+ *  - share_title: Title passed to navigator.share().
+ *  - share_text: Description text passed to navigator.share().
+ *  - heading: Optional visible heading.
+ *  - webshare_links_id: Unique id for the links list.
+ *  - orientation: 'horizontal' or 'vertical'.
+ *  - mobile_visibility: 'all', 'hide_mobile' or 'mobile_only'.
+ *  - placement: 'inline' or 'rail-end' (sticky column at the content end).
+ *  - native_share: Whether to render the native share button.
+ *  - native_label: Label for the native share button.
+ *  - native_icon: URL of the native button icon (defaults to module logo).
+ *  - native_icon_html: Pre-rendered icon markup from the Drupal Core Icons
+ *    API; takes precedence over native_icon when non-empty.
+ *  - platforms: Array of platform share buttons. Each item exposes:
+ *      - key: machine name (e.g. 'linkedin', 'facebook_share', 'copy').
+ *      - url: resolved share URL ('#' for copy).
+ *      - title: button accessible label.
+ *      - icon_src: icon URL (when no Icons API mapping is configured).
+ *      - icon_html: pre-rendered Icons API markup; preferred over icon_src.
+ *      - icon_alt: icon alt text.
+ *      - label: text label (when style=custom).
+ *      - is_copy: TRUE for the copy-to-clipboard platform.
+ */
+#}
+{% set classes = [
+  'webshare',
+  'webshare--' ~ (orientation|default('horizontal')),
+  'webshare--' ~ (placement|default('inline')),
+  'webshare--align-' ~ (alignment|default('start')),
+  mobile_visibility == 'hide_mobile' ? 'webshare--hide-mobile',
+  mobile_visibility == 'mobile_only' ? 'webshare--mobile-only',
+] %}
+{% set heading_id = webshare_links_id ? webshare_links_id ~ '-heading' : 'webshare-heading-' ~ random() %}
+{% set region_label = heading ?: 'Share this page'|t %}
+{% set native_icon_src = native_icon|default('') %}
+<nav{{ attributes
+  .addClass(classes)
+  .setAttribute('aria-label', region_label)
+  .setAttribute('data-webshare-url', url)
+  .setAttribute('data-webshare-title', share_title)
+  .setAttribute('data-webshare-text', share_text)
+}}>
+  {% if heading %}
+    <h3 id="{{ heading_id }}" class="webshare__heading">{{ heading }}</h3>
+  {% endif %}
+  <ul id="{{ webshare_links_id }}" class="webshare__list"{% if heading %} aria-labelledby="{{ heading_id }}"{% endif %}>
+    {% if native_share %}
+      <li class="webshare__item webshare__item--native" data-webshare-native>
+        <button type="button" class="webshare__native-button" aria-label="{{ native_label|default('Share this page'|t) }}">
+          {% if native_icon_html %}
+            <span class="webshare__native-icon" aria-hidden="true">{{ native_icon_html|raw }}</span>
+          {% elseif native_icon_src %}
+            <img src="{{ native_icon_src }}" alt="" aria-hidden="true" class="webshare__native-icon" width="20" height="20">
+          {% endif %}
+          <span class="visually-hidden">{{ native_label|default('Share'|t) }}</span>
+        </button>
+      </li>
+    {% endif %}
+    {% for platform in platforms|default([]) %}
+      <li class="webshare__item webshare__item--{{ platform.key }}">
+        {% if platform.is_copy %}
+          <button type="button" class="webshare__copy-button" data-webshare-copy="{{ url }}" aria-label="{{ platform.title|default('Copy URL'|t) }}">
+            {% if platform.icon_html %}
+              <span aria-hidden="true">{{ platform.icon_html|raw }}</span>
+            {% elseif platform.icon_src %}
+              <img src="{{ platform.icon_src }}" alt="" aria-hidden="true" width="20" height="20">
+            {% else %}
+              <span aria-hidden="true">{{ platform.label|default(platform.title) }}</span>
+            {% endif %}
+          </button>
+        {% else %}
+          <a href="{{ platform.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ platform.title }} {{ '(opens in a new tab)'|t }}">
+            {% if platform.icon_html %}
+              <span aria-hidden="true">{{ platform.icon_html|raw }}</span>
+            {% elseif platform.icon_src %}
+              <img src="{{ platform.icon_src }}" alt="" aria-hidden="true" width="20" height="20">
+            {% else %}
+              <span aria-hidden="true">{{ platform.label|default(platform.title) }}</span>
+            {% endif %}
+            <span class="visually-hidden">{{ '(opens in a new tab)'|t }}</span>
+          </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

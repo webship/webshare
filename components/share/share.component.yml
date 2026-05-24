@@ -1,0 +1,86 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata-full.schema.json
+name: Share
+status: stable
+description: 'Social share buttons with native Web Share API support, selectable orientation and mobile visibility. Implementation detail of the Sharing block — disabled in the Canvas component library so the block remains the single entry point.'
+libraryOverrides:
+  dependencies:
+    - core/drupal
+    - core/once
+props:
+  type: object
+  properties:
+    url:
+      type: string
+      title: 'Share URL'
+      description: 'The absolute URL being shared.'
+    share_title:
+      type: string
+      title: 'Share title'
+      description: 'Title passed to the native Web Share API.'
+    share_text:
+      type: string
+      title: 'Share text'
+      description: 'Description text passed to the native Web Share API. Most reliable field across mobile and tablet share targets.'
+    heading:
+      type: string
+      title: 'Heading'
+      description: 'Optional visible heading above the buttons.'
+    webshare_links_id:
+      type: string
+      title: 'Links wrapper id'
+    alignment:
+      type: string
+      title: 'Alignment'
+      description: 'Logical side the buttons align to (start or end; RTL-aware).'
+      enum:
+        - start
+        - end
+      default: end
+    orientation:
+      type: string
+      title: 'Orientation'
+      enum:
+        - horizontal
+        - vertical
+      default: vertical
+    mobile_visibility:
+      type: string
+      title: 'Mobile visibility'
+      description: 'Control whether the component is shown on small screens.'
+      enum:
+        - all
+        - hide_mobile
+        - mobile_only
+      default: all
+    placement:
+      type: string
+      title: 'Placement'
+      description: 'inline keeps the buttons in the content flow; rail-end floats them as a sticky column at the end side of the content.'
+      enum:
+        - inline
+        - rail-end
+      default: rail-end
+    native_share:
+      type: boolean
+      title: 'Native share button'
+      description: 'Render a button that triggers the native Web Share API when supported.'
+      default: false
+    native_label:
+      type: string
+      title: 'Native button label'
+      default: Share
+    native_icon:
+      type: string
+      title: 'Native button icon URL'
+      description: 'Path to the SVG/PNG icon shown inside the native share button. Used when no Icons API icon is configured.'
+      default: ''
+    native_icon_html:
+      type: string
+      title: 'Native button icon HTML'
+      description: 'Pre-rendered icon markup from the Drupal Core Icons API. Takes precedence over `native_icon` when non-empty.'
+      default: ''
+    platforms:
+      type: array
+      title: 'Platforms'
+      description: 'List of enabled platform share buttons. Each item is an object with `key` (platform id), `url` (resolved share URL or "#" for copy), `title`, `icon_src`, `icon_alt`, `is_copy` (true for the clipboard platform).'
+      default: []

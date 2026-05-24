@@ -96,51 +96,13 @@ class WebshareConfigForm extends ConfigFormBase
    */
   public function buildForm(array $form, FormStateInterface $form_state)
   {
-      $form['#attached']['library'][] = 'webshare/webshare-admin';
-
       $config = $this->config('webshare.settings');
 
-    // Platform management section with horizontal tabs
-      $form['platforms'] = [
-      '#type' => 'horizontal_tabs',
-      '#title' => $this->t('Social Media Platforms'),
-      '#weight' => -10,
-      ];
-
-      // General settings tab
-      $form['general'] = [
-      '#type' => 'details',
-      '#title' => $this->t('General Settings'),
-      '#group' => 'platforms',
-      '#weight' => -5,
-      ];
-
-      $form['general']['title'] = [
-      '#type' => 'container',
-      '#attributes' => [
-      'class' => [
-        'clearfix',
-      ],
-      ],
-      ];
-      $form['general']['title']['title_text'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Title'),
-      '#default_value' => $config->get('title'),
-      '#description' => $this->t('The title displayed above the sharing buttons.'),
-      ];
-      $form['general']['title']['display_title'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Display title'),
-      '#default_value' => $config->get('display_title'),
-      ];
-
-      // Platform management tab
+      // Platform management section. Heading + display_title + alignment
+      // moved to block-level config (and the SDC share component props),
+      // so the admin form is now just the platform table + add/edit modal.
       $form['platform_management'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Manage Platforms'),
-      '#group' => 'platforms',
-      '#weight' => 0,
+      '#type' => 'container',
       ];
 
       // Get platforms from database (with error handling)
@@ -250,48 +212,6 @@ class WebshareConfigForm extends ConfigFormBase
       'data-dialog-options' => '{"width":700,"height":600}',
       ],
       ];
-      $form['general']['display_intro'] = [
-      '#markup' => '<div class="display-settings-intro">' .
-      '<p>' . $this->t('Configure how and where the sharing buttons appear on your site.') . '</p>' .
-      '</div>',
-      ];
-      $form['general']['style'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Style'),
-      '#options' => [
-      'webshare' => $this->t('Webshare'),
-      'custom' => $this->t('Custom'),
-      ],
-      '#description' => $this->t('Select the style of the buttons.'),
-      '#default_value' => $config->get('style'),
-      ];
-      $form['general']['libraries'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Libraries'),
-      '#options' => [
-      'include_css' => $this->t('Include default CSS.'),
-      'include_js' => $this->t('Include default JavaScript.'),
-      ],
-      '#description' => $this->t('Select which libraries to include.'),
-      '#default_value' => [$config->get('include_css'), $config->get('include_js')],
-      '#states' => [
-      'visible' => [
-        'input[name="style"]' => ['value' => 'custom'],
-      ],
-      ],
-      ];
-
-      $form['general']['alignment'] = [
-      '#type' => 'radios',
-      '#title' => $this->t('Alignment'),
-      '#options' => [
-      'left' => $this->t('Left side'),
-      'right' => $this->t('Right side'),
-      ],
-      '#description' => $this->t('Select which side of the page the buttons will appear on.'),
-      '#default_value' => $config->get('alignment'),
-      ];
-
       return parent::buildForm($form, $form_state);
   }
 
@@ -318,7 +238,6 @@ class WebshareConfigForm extends ConfigFormBase
    */
   public function submitForm(array &$form, FormStateInterface $form_state)
   {
-      $config = $this->config('webshare.settings');
       $form_values = $form_state->getValues();
 
     // Update platform data
@@ -334,14 +253,6 @@ class WebshareConfigForm extends ConfigFormBase
           ->execute();
       }
     }
-
-      $config->set('title', $form_values['title_text'])
-      ->set('display_title', $form_values['display_title'])
-      ->set('style', $form_values['style'])
-      ->set('include_css', $form_values['libraries']['include_css'])
-      ->set('include_js', $form_values['libraries']['include_js'])
-      ->set('alignment', $form_values['alignment'])
-      ->save();
 
       $this->renderCache->deleteAll();
       parent::submitForm($form, $form_state);

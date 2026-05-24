@@ -2,11 +2,12 @@
 
 namespace Drupal\webshare;
 
-use Drupal\Core\Condition\ConditionManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a WebshareService service.
@@ -20,13 +21,6 @@ class WebshareService implements WebshareServiceInterface {
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
-
-  /**
-   * The condition manager.
-   *
-   * @var \Drupal\Core\Condition\ConditionManager
-   */
-  protected $conditionManager;
 
   /**
    * The extension module list.
@@ -43,47 +37,99 @@ class WebshareService implements WebshareServiceInterface {
   protected $database;
 
   /**
+   * The Drupal Core Icon Pack plugin manager, when available.
+   *
+   * Provided by Drupal core (11.1+) — and also by the `ui_icons` contrib
+   * module on older sites — under the `plugin.manager.icon_pack` service
+   * id. We hold a nullable reference so the module works on Drupal versions
+   * that pre-date the Icons API.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface|null
+   */
+  protected $iconPackManager;
+
+  /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Constructs an WebshareService object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The Configuration Factory.
-   * @param \Drupal\Core\Condition\ConditionManager $condition_manager
-   *   The condition manager.
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The extenstion list module.
+   *   The extension module list.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
+   * @param \Drupal\Core\Render\RendererInterface|null $renderer
+   *   The renderer.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface|null $icon_pack_manager
+   *   The Icon Pack plugin manager. NULL when neither Drupal Core 11.1+
+   *   nor the ui_icons contrib module is enabled.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ConditionManager $condition_manager, ModuleExtensionList $module_extension_list, Connection $database) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    ModuleExtensionList $module_extension_list,
+    Connection $database,
+    ?RendererInterface $renderer = NULL,
+    $icon_pack_manager = NULL,
+  ) {
     $this->configFactory = $config_factory;
-    $this->conditionManager = $condition_manager;
     $this->moduleExtensionList = $module_extension_list;
     $this->database = $database;
+    $this->renderer = $renderer ?: \Drupal::service('renderer');
+    $this->iconPackManager = $icon_pack_manager;
+  }
+
+  /**
+   * Factory for the Drupal service container.
+   *
+   * The Icons API is not yet a hard dependency, so the matching plugin
+   * manager is injected only when present.
+   */
+  public static function create(ContainerInterface $container): static {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('extension.list.module'),
+      $container->get('database'),
+      $container->get('renderer'),
+      $container->has('plugin.manager.icon_pack')
+        ? $container->get('plugin.manager.icon_pack')
+        : NULL,
+    );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function build($url, $id) {
+  public function build($url, $id, array $options = []) {
     global $base_url;
     $config = $this->configFactory->get('webshare.settings');
     $module_path = $this->moduleExtensionList->getPath('webshare');
-    $build = ['#theme' => 'webshare'];
     $buttons = [];
-    $library = [];
 
-    switch ($config->get('alignment')) {
-      case 'left':
-        $build['#attributes']['class'] = [
-          'webshare-left',
-        ];
-          break;
-
-      case 'right':
-        $build['#attributes']['class'] = [
-          'webshare-right',
-        ];
-          break;
+    // Resolve presentation options. Heading / alignment / orientation /
+    // mobile_visibility / placement / native_share all live on the block
+    // (and any future callers) — the module config no longer carries them.
+    $alignment = $options['alignment'] ?? 'end';
+    if (!in_array($alignment, ['start', 'end'], TRUE)) {
+      $alignment = 'end';
+    }
+    $orientation = $options['orientation'] ?? 'vertical';
+    if (!in_array($orientation, ['horizontal', 'vertical'], TRUE)) {
+      $orientation = 'vertical';
+    }
+    $mobile_visibility = $options['mobile_visibility'] ?? 'all';
+    if (!in_array($mobile_visibility, ['all', 'hide_mobile', 'mobile_only'], TRUE)) {
+      $mobile_visibility = 'all';
+    }
+    $native_share = $options['native_share'] ?? FALSE;
+    $placement = $options['placement'] ?? 'rail-end';
+    if (!in_array($placement, ['inline', 'rail-end'], TRUE)) {
+      $placement = 'rail-end';
     }
 
     // Get enabled platforms from database (fallback to config if table doesn't exist)
@@ -126,115 +172,127 @@ class WebshareService implements WebshareServiceInterface {
       }
     }
 
+    $icon_map = $config->get('icon_map') ?: [];
+    $platform_items = [];
     foreach ($platforms as $platform) {
       $key = $platform->platform_id;
-      $buttons[$key] = [
-        '#theme' => 'webshare_' . $key,
-        '#url' => $url,
-        '#platform' => $platform,
-      ];
+      $is_copy = empty($platform->url_template);
 
-      if ($config->get('style') == 'webshare') {
+      // Resolve share URL — placeholder substitution for templated platforms;
+      // '#' for the copy-to-clipboard platform (JS handles the click).
+      $share_url = '#';
+      if (!$is_copy) {
+        $share_url = strtr($platform->url_template, [
+          '[url]' => rawurlencode($url),
+          '[title]' => rawurlencode((string) ($options['share_title'] ?? '')),
+        ]);
+      }
+
+      // Prefer a Drupal Core Icons API icon when one is mapped to this
+      // platform and the referenced icon pack is registered. Fall back to
+      // the legacy bundled SVG image otherwise.
+      $icon_html = $this->renderIconHtml($icon_map[$key] ?? NULL);
+      $icon_src = '';
+      if ($icon_html === '') {
         $image_src = $platform->image;
-        // If image path doesn't contain module path, prepend it
         if (!str_contains($image_src, $module_path) && !str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
           $image_src = $module_path . '/img/' . $image_src;
         }
-        // Handle both relative and absolute paths
         if (!str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
           $image_src = $base_url . '/' . $image_src;
-        } elseif (str_starts_with($image_src, '/')) {
+        }
+        elseif (str_starts_with($image_src, '/')) {
           $image_src = $base_url . $image_src;
         }
-
-        $buttons[$key]['#content'] = [
-          '#type' => 'html_tag',
-          '#tag' => 'img',
-          '#attributes' => [
-            'src' => $image_src,
-            'title' => $this->t($platform->title),
-            'alt' => $this->t($platform->title),
-          ],
-        ];
-      } elseif ($config->get('style') == 'custom') {
-        $buttons[$key]['#content'] = $this->t($platform->name);
+        $icon_src = $image_src;
       }
-    }
-    $build['#buttons'] = $buttons;
-    $build['#webshare_links_id'] = 'webshare-links-' . $id;
 
-    if ($config->get('display_title')) {
-      $build['#title'] = $this->t($config->get('title'));
+      $platform_items[] = [
+        'key' => $key,
+        'url' => $share_url,
+        'title' => (string) $this->t($platform->title),
+        'icon_src' => $icon_src,
+        'icon_html' => $icon_html,
+        'icon_alt' => (string) $this->t($platform->title),
+        'label' => '',
+        'is_copy' => $is_copy,
+      ];
     }
 
-    $build['#share_icon'] = [
-      'id' => 'webshare-trigger-' . $id,
-      'src' => $base_url . '/' . $module_path . '/img/' . $config->get('share_icon.image'),
-      'alt' => $this->t($config->get('share_icon.alt')),
+    // Native share button icon: Icons API entry first, module logo as fall.
+    $native_icon_html = $this->renderIconHtml($config->get('native_share_icon'));
+    $native_icon_src = $native_icon_html === '' ? '/' . $module_path . '/logo.svg' : '';
+
+    // Render through the Webshare single-directory component.
+    $build = [
+      '#type' => 'component',
+      '#component' => 'webshare:share',
+      '#props' => [
+        'url' => $url,
+        'share_title' => (string) ($options['share_title'] ?? ''),
+        'share_text' => (string) ($options['share_text'] ?? ''),
+        'webshare_links_id' => 'webshare-links-' . $id,
+        'alignment' => $alignment,
+        'orientation' => $orientation,
+        'mobile_visibility' => $mobile_visibility,
+        'placement' => $placement,
+        'native_share' => (bool) $native_share,
+        'native_label' => (string) $this->t('Share'),
+        // Module-relative path to the Webshare logo, used as the native
+        // share button icon when the Icons API has no mapping.
+        'native_icon' => $native_icon_src,
+        'native_icon_html' => $native_icon_html,
+        'platforms' => $platform_items,
+      ],
+      // The single-directory component (webshare:share) auto-attaches its
+      // own scoped CSS and JS, so no #attached library is required here.
     ];
 
-    if ($config->get('style') == 'webshare') {
-      if ($config->get('collapsible')) {
-        $library = [
-          'webshare/webshare-styles',
-          'webshare/webshare-script',
-        ];
-      } else {
-        $library = [
-          'webshare/webshare-styles',
-          'webshare/webshare-script',
-        ];
-      }
-    } elseif ($config->get('style') == 'custom') {
-      if ($config->get('include_css')) {
-        $library = [
-          'webshare/webshare-styles',
-        ];
-      }
-    }
-
-    if (!empty($library)) {
-      $build['#attached'] = [
-        'library' => $library,
-      ];
+    // Heading is now exclusively a caller-provided prop. The block builds
+    // it from its own "Display title" + "Title" settings; an empty string
+    // suppresses the heading entirely.
+    if (!empty($options['heading'])) {
+      $build['#props']['heading'] = (string) $options['heading'];
     }
 
     return $build;
   }
 
   /**
-   * {@inheritdoc}
+   * Renders an icon via the Drupal Core Icons API if one is configured.
+   *
+   * Supports both Drupal core's built-in `#type: icon` render element
+   * (Drupal 11.1+) and the matching plugin manager exposed by the
+   * `ui_icons` contrib module. When neither service is available, or the
+   * referenced icon pack is not registered, an empty string is returned
+   * so callers fall back to the legacy `<img>` rendering.
+   *
+   * @param array|null $reference
+   *   Icon reference array with `pack` and `icon` keys, or NULL.
+   *
+   * @return string
+   *   The rendered icon markup, or an empty string when no icon can be
+   *   resolved.
    */
-  public function isRestricted($view_mode) {
-    $config = $this->configFactory->get('webshare.settings');
-
-    switch ($view_mode) {
-      case 'search_result':
-      case 'search_index':
-      case 'rss':
-          return TRUE;
+  protected function renderIconHtml($reference): string {
+    if (!$this->iconPackManager || !is_array($reference)) {
+      return '';
     }
-
-    $restricted_pages = $config->get('restricted_pages.pages');
-
-    if (is_array($restricted_pages) && !empty($restricted_pages)) {
-      $restriction_type = $config->get('restricted_pages.type');
-
-      // Replace a single / with <front> so it matches with the front path.
-      if (($index = array_search('/', $restricted_pages)) !== FALSE) {
-        $restricted_pages[$index] = '<front>';
-      }
-
-      /** @var \Drupal\system\Plugin\Condition\RequestPath $request_path_condition */
-      $request_path_condition = $this->conditionManager->createInstance('request_path', [
-        'pages' => implode("\n", $restricted_pages),
-        'negate' => $restriction_type == 'show',
-      ]);
-
-      return $request_path_condition->execute();
+    $pack_id = $reference['pack'] ?? '';
+    $icon_id = $reference['icon'] ?? '';
+    if ($pack_id === '' || $icon_id === '') {
+      return '';
     }
-
-    return FALSE;
+    // Only render when the icon pack is actually registered.
+    if (!$this->iconPackManager->hasDefinition($pack_id)) {
+      return '';
+    }
+    $build = [
+      '#type' => 'icon',
+      '#pack_id' => $pack_id,
+      '#icon_id' => $icon_id,
+    ];
+    return (string) $this->renderer->renderInIsolation($build);
   }
 
   /**

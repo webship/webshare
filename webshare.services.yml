@@ -1,8 +1,5 @@
 services:
   webshare.service:
     class: Drupal\webshare\WebshareService
-    arguments:
-      - '@config.factory'
-      - '@plugin.manager.condition'
-      - '@extension.list.module'
-      - '@database'
+    factory: ['Drupal\webshare\WebshareService', 'create']
+    arguments: ['@service_container']

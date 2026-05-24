@@ -1,70 +1,32 @@
 webshare.settings:
   type: config_object
+  label: 'Webshare settings'
   mapping:
     buttons:
-      type: mapping
-      mapping:
-        facebook_share:
-          type: webshare.image_button
-        x:
-          type: webshare.image_button
-        linkedin:
-          type: webshare.image_button
-        whatsapp:
-          type: webshare.image_button
-        copy:
-          type: webshare.image_button
-    title:
-      type: string
-    display_title:
-      type: integer
-    style:
-      type: string
-    include_css:
-      type: string
-    include_js:
-      type: string
-    alignment:
-      type: string
-    per_entity:
-      type: integer
-    content_types:
       type: sequence
+      label: 'Platform fallback buttons (keyed by platform id)'
       sequence:
-        type: string
-    view_modes:
+        type: webshare.image_button
+    icon_map:
       type: sequence
+      label: 'Per-platform icon map (Drupal Core Icons API)'
       sequence:
-        type: sequence
-        sequence:
-          type: string
-    product_types:
-      type: sequence
-      sequence:
-        type: string
-    product_view_modes:
-      type: sequence
-      sequence:
-        type: sequence
-        sequence:
-          type: string
-    restricted_pages:
-      type: mapping
-      mapping:
-        pages:
-          type: sequence
-          sequence:
-            type: string
-        type:
-          type: string
-    enabled_entities:
-      type: sequence
-      sequence:
-        type: sequence
-        sequence:
-          type: integer
-    weight:
-      type: integer
+        type: webshare.icon_reference
+    native_share_icon:
+      type: webshare.icon_reference
+      label: 'Native share button icon (Drupal Core Icons API)'
+
+# Reference to an icon registered with the Drupal Core Icons API (also
+# served by the ui_icons contrib module on older sites).
+webshare.icon_reference:
+  type: mapping
+  mapping:
+    pack:
+      type: string
+      label: 'Icon pack id'
+    icon:
+      type: string
+      label: 'Icon id'
 
 webshare.image_button:
   type: mapping
@@ -79,3 +41,55 @@ webshare.image_button:
       type: string
     weight:
       type: integer
+
+# Schema for the Share (share) block plugin settings.
+# Required by Drupal Canvas, which validates every component instance's
+# configuration against the matching schema.
+block.settings.share:
+  type: block_settings
+  label: 'Share block'
+  # Drupal Canvas requires every block component to opt in to strict
+  # config validation via the FullyValidatable constraint so it can
+  # safely render the block as a Canvas component on content templates.
+  # @see https://www.drupal.org/node/3404425
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    heading:
+      type: label
+      label: 'Title'
+    display_title:
+      type: boolean
+      label: 'Display title'
+    alignment:
+      type: string
+      label: 'Alignment'
+      constraints:
+        Choice:
+          - start
+          - end
+    orientation:
+      type: string
+      label: 'Orientation'
+      constraints:
+        Choice:
+          - horizontal
+          - vertical
+    mobile_visibility:
+      type: string
+      label: 'Mobile visibility'
+      constraints:
+        Choice:
+          - all
+          - hide_mobile
+          - mobile_only
+    native_share:
+      type: boolean
+      label: 'Show native share button'
+    placement:
+      type: string
+      label: 'Placement'
+      constraints:
+        Choice:
+          - inline
+          - rail-end

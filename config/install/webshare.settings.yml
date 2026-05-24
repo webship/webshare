@@ -1,57 +1,102 @@
+# Webshare default settings.
+#
+# Presentation (title / display_title / alignment / orientation / mobile
+# visibility / placement / native share toggle) lives on the Share block
+# and is passed through to the `webshare:share` SDC component as props.
+# The module config below carries only:
+#   - platform table fallback (`buttons`, used when the
+#     `webshare_platforms` database table is empty)
+#   - Drupal Core Icons API mapping (`icon_map`, `native_share_icon`)
+#
+# The five core platforms (linkedin / facebook_share / x / whatsapp /
+# copy) are enabled by default for backwards compatibility — every other
+# platform ships disabled so the rendered share rail stays focused. Site
+# builders enable additional networks via /admin/config/services/webshare.
 buttons:
-  facebook_share:
-    name: 'Facebook share'
-    title: 'Share on Facebook'
-    enabled: 1
-    image: 'facebook-share.svg'
-    weight: 0
-  x:
-    name: 'X'
-    title: 'Share on X'
-    enabled: 1
-    image: 'x.svg'
-    weight: 1
   linkedin:
     name: 'LinkedIn'
     title: 'Share on LinkedIn'
     enabled: 1
     image: 'linkedin.svg'
+    weight: 0
+  facebook_share:
+    name: 'Facebook share'
+    title: 'Share on Facebook'
+    enabled: 1
+    image: 'facebook-share.svg'
+    weight: 1
+  x:
+    name: 'X'
+    title: 'Share on X'
+    enabled: 1
+    image: 'x.svg'
     weight: 2
   whatsapp:
     name: 'WhatsApp'
     title: 'Share via WhatsApp'
-    enabled: 1
+    enabled: 0
     image: 'whatsapp.svg'
-    weight: 5
+    weight: 3
   copy:
     name: 'Copy URL'
     title: 'Copy site URL'
-    enabled: 1
+    enabled: 0
     image: copy-url.svg
+    weight: 4
+  email:
+    name: 'Email'
+    title: 'Share via Email'
+    enabled: 0
+    image: 'email.svg'
+    weight: 5
+  telegram:
+    name: 'Telegram'
+    title: 'Share on Telegram'
+    enabled: 0
+    image: 'telegram.svg'
     weight: 6
-share_icon:
-  image: 'share-icon.svg'
-  alt: 'Share icon'
-title: 'Share'
-display_title: 1
-style: 'webshare'
-include_css: 'include_css'
-include_js: 'include_js'
-alignment: 'left'
-content_types:
-  article: 'article'
-  page: 'page'
-view_modes:
-  article:
-    full: 'full'
-  page:
-    full: 'full'
-product_types:
-  default: 'default'
-product_view_modes:
-  default:
-    full: 'full'
-restricted_pages:
-  pages: { }
-  type: 'show'
-weight: 10
+  reddit:
+    name: 'Reddit'
+    title: 'Share on Reddit'
+    enabled: 0
+    image: 'reddit.svg'
+    weight: 7
+  pinterest:
+    name: 'Pinterest'
+    title: 'Pin on Pinterest'
+    enabled: 0
+    image: 'pinterest.svg'
+    weight: 8
+  threads:
+    name: 'Threads'
+    title: 'Share on Threads'
+    enabled: 0
+    image: 'threads.svg'
+    weight: 9
+  bluesky:
+    name: 'Bluesky'
+    title: 'Share on Bluesky'
+    enabled: 0
+    image: 'bluesky.svg'
+    weight: 10
+  tumblr:
+    name: 'Tumblr'
+    title: 'Share on Tumblr'
+    enabled: 0
+    image: 'tumblr.svg'
+    weight: 11
+  mastodon:
+    name: 'Mastodon'
+    title: 'Share on Mastodon'
+    enabled: 0
+    image: 'mastodon.svg'
+    weight: 12
+
+# Drupal Core Icons API integration. Each entry maps a platform key (or
+# the native share button) to an icon pack + icon id. Rendered via
+# `#type: icon` when the referenced pack is registered. Empty by default
+# so the module stays icon-library-agnostic — themes / sites pick their
+# preferred pack (bootstrap_icons, phosphor, font-awesome, vartheme_social,
+# material_symbols, etc.) by overriding these keys.
+icon_map: {  }
+native_share_icon: {  }

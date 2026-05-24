@@ -3,24 +3,37 @@
  * @file
  * Generic template for social media sharing platforms.
  *
+ * Accessibility:
+ *  - External share links use rel="noopener noreferrer" for both security
+ *    and assistive-tech clarity, plus a visually-hidden "(opens in a new
+ *    tab)" announcement so screen-reader users know the link opens in a
+ *    new window.
+ *  - The copy-URL action is rendered as a real <button> rather than an
+ *    anchor with href="#", so keyboard / screen-reader semantics match its
+ *    behaviour and there is no spurious navigation on click.
+ *  - Each button exposes an accessible name through aria-label, which
+ *    means the underlying icon is presentational and is marked with
+ *    aria-hidden="true".
+ *
  * Available variables:
  *  - url: The url of the page to be shared.
  *  - content: The button's image or other content to appear on the page.
  *  - platform: Platform object with configuration data.
- *
  */
 #}
 {% set page_title = '' %}
-{% if platform and platform.url_template %}
+{% set icon %}<span aria-hidden="true">{{ content }}</span>{% endset %}
+{% if platform %}
   {% if platform.url_template is empty %}
-    {# Copy URL functionality #}
-    <a href="#" class="webshare-copy-url" data-url="{{ url }}" data-clipboard="{{ url }}">{{ content }}</a>
+    {# Copy URL — a real <button> for correct a11y semantics. #}
+    <button type="button" class="webshare-copy-url" data-url="{{ url }}" data-clipboard="{{ url }}" aria-label="{{ platform.title|default('Copy URL'|t) }}">{{ icon }}</button>
   {% else %}
-    {# Standard sharing URL #}
     {% set sharing_url = platform.url_template|replace({'[url]': url|url_encode, '[title]': page_title|url_encode}) %}
-    <a href="{{ sharing_url }}" target="_blank" rel="noreferrer" title="{{ platform.title }}">{{ content }}</a>
+    <a href="{{ sharing_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ platform.title }} {{ '(opens in a new tab)'|t }}">
+      {{ icon }}
+      <span class="visually-hidden">{{ '(opens in a new tab)'|t }}</span>
+    </a>
   {% endif %}
 {% else %}
-  {# Fallback for platforms without URL template #}
-  <span>{{ content }}</span>
+  <span aria-hidden="true">{{ content }}</span>
 {% endif %}

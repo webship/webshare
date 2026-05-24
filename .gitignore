@@ -4,3 +4,12 @@ node_modules
 yarn-error.log
 ADMIN_GUIDE.md
 .eslintcache
+
+# Test + automation runtime artifacts.
+screenshots/
+videos/
+tests/reports/
+
+# Playwright + Claude session captures.
+.playwright-mcp/
+.claude/

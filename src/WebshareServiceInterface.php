@@ -5,30 +5,29 @@ namespace Drupal\webshare;
 /**
  * Interface for WebshareService.
  */
-interface WebshareServiceInterface
-{
+interface WebshareServiceInterface {
 
   /**
-   * Builds a renderable array of Social buttons.
+   * Builds a renderable array of share buttons.
    *
    * @param string $url
-   *   Node url.
+   *   Page url being shared.
    * @param string $id
-   *   Node entity type plus node id.
+   *   Stable id used to scope the buttons' DOM ids.
+   * @param array $options
+   *   Optional presentation overrides:
+   *   - heading: Explicit component heading; empty string suppresses.
+   *   - alignment: 'start' (default) or 'end' (logical CSS).
+   *   - orientation: 'horizontal' (default) or 'vertical'.
+   *   - mobile_visibility: 'all', 'hide_mobile' or 'mobile_only'.
+   *   - placement: 'inline' (default) or 'rail-end'.
+   *   - native_share: Whether to render the native Web Share API button.
+   *   - share_title: Title passed to the native Web Share API.
+   *   - share_text: Description text passed to the native Web Share API.
    *
    * @return array
-   *   Renderable build array.
+   *   Renderable build array consuming the `webshare:share` SDC component.
    */
-  public function build($url, $id);
+  public function build($url, $id, array $options = []);
 
-  /**
-   * Determines if module is restricted to show or not on certain pages.
-   *
-   * @param string $view_mode
-   *   Entity view mode.
-   *
-   * @return bool
-   *   Returns TRUE or FALSE.
-   */
-  public function isRestricted($view_mode);
 }

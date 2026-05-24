@@ -14,8 +14,12 @@
     "lint:js": "eslint --cache --cache-location .eslintcache --ext .js js/",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:yaml": "eslint --ext .yml .",
-    "spellcheck": "cspell lint ."
-
+    "spellcheck": "cspell lint .",
+    "test": "cucumber-js --config cucumber.js",
+    "test:chromium": "BROWSER=chromium cucumber-js --config cucumber.js",
+    "test:firefox": "BROWSER=firefox cucumber-js --config cucumber.js",
+    "test:webkit": "BROWSER=webkit cucumber-js --config cucumber.js",
+    "generate-reports": "generate-reports"
   },
   "devDependencies": {
     "chalk": "^5.3.0",
@@ -58,5 +62,8 @@
     "social-sharing",
     "webshare",
     "social-media"
-  ]
+  ],
+  "dependencies": {
+    "webship-js": "~2.0.0"
+  }
 }
