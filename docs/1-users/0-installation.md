@@ -18,11 +18,11 @@ required.
 
 ### Optional Dependencies
 
-- **Drupal Canvas** (`drupal/canvas`) — required only if you want to place
+- **Drupal Canvas** (`drupal/canvas`) - required only if you want to place
   the Share component on Canvas pages, page_region entities, or content
   templates. Webshare exposes its SDC as `sdc.webshare.share` to Canvas
   automatically when Canvas is enabled.
-- **Drupal Core Icons API** (Drupal 11.1+) or **ui_icons** contrib module —
+- **Drupal Core Icons API** (Drupal 11.1+) or **ui_icons** contrib module -
   required only if you want to render share icons through a registered
   icon pack instead of the bundled SVGs. See
   [Drupal Core Icons API](../2-admins/5-icons-api.md).
@@ -70,11 +70,11 @@ After enabling the module:
 You can place the share rail three ways. The next step depends on how your
 site is built:
 
-- **Classic block layout** — go to
+- **Classic block layout** - go to
   [Block Placement](../2-admins/2-block-placement.md).
-- **Drupal Canvas-managed pages** — go to
+- **Drupal Canvas-managed pages** - go to
   [Drupal Canvas Integration](../2-admins/3-canvas-integration.md).
-- **Custom Twig template** — call the `webshare:share` SDC directly
+- **Custom Twig template** - call the `webshare:share` SDC directly
   with `{% embed 'webshare:share' %}`. See
   [The Share SDC Component](../3-developers/3-sdc-component.md).
 

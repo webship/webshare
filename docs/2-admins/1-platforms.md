@@ -15,7 +15,7 @@ enabled on a fresh install; the rest are disabled.
 | ★ | `facebook_share` | Facebook share    | `facebook.com/sharer/sharer.php?u=[url]`                    |
 | ★ | `x`              | X                 | `twitter.com/intent/tweet?url=[url]&text=[title]`           |
 |   | `whatsapp`       | WhatsApp          | `api.whatsapp.com/send?text=[title]%20[url]`                |
-|   | `copy`           | Copy URL          | *(clipboard button — no URL template)*                      |
+|   | `copy`           | Copy URL          | *(clipboard button - no URL template)*                      |
 |   | `email`          | Email             | `mailto:?subject=[title]&body=[url]`                        |
 |   | `telegram`       | Telegram          | `t.me/share/url?url=[url]&text=[title]`                     |
 |   | `reddit`         | Reddit            | `reddit.com/submit?url=[url]&title=[title]`                 |
@@ -51,14 +51,14 @@ Platforms with a lower weight appear earlier in the rendered rail.
 Click the **Edit** operation in the dropbutton on the row you want to
 change. An AJAX modal opens with the following fields:
 
-- **Platform Name** — display name shown to administrators.
-- **Platform Title** — accessible label / hover title shown on the
+- **Platform Name** - display name shown to administrators.
+- **Platform Title** - accessible label / hover title shown on the
   rendered share link (`aria-label`).
-- **Sharing URL Template** — pattern with `[url]` / `[title]` tokens;
+- **Sharing URL Template** - pattern with `[url]` / `[title]` tokens;
   empty for the clipboard-style "Copy URL" platform.
-- **Platform Icon** — optional file upload to override the bundled SVG.
-- **Enabled** — same checkbox as the table column.
-- **Weight** — same weight as the table column.
+- **Platform Icon** - optional file upload to override the bundled SVG.
+- **Enabled** - same checkbox as the table column.
+- **Weight** - same weight as the table column.
 
 Saves go directly to the database; you do not need to click **Save
 configuration** on the parent form.
@@ -70,17 +70,17 @@ sharer) are not bundled. To add one:
 
 1. Click **Add Custom Platform** at the bottom of the table.
 2. Fill in the same fields as the Edit modal:
-    - **Platform Name** — required.
-    - **Platform ID** — auto-generated machine name from the name (you
+    - **Platform Name** - required.
+    - **Platform ID** - auto-generated machine name from the name (you
       can override it; must be unique).
-    - **Platform Title** — accessible label.
-    - **Sharing URL Template** — e.g.
+    - **Platform Title** - accessible label.
+    - **Sharing URL Template** - e.g.
       `https://my.mastodon.host/share?text=[title]%20[url]`.
-    - **Platform Icon** — upload an SVG or PNG.
+    - **Platform Icon** - upload an SVG or PNG.
 3. Click **Save**. The new row appears in the table marked as
    `is_custom`.
 
-Custom platforms behave exactly like built-in ones — the same
+Custom platforms behave exactly like built-in ones - the same
 enable / weight / edit / delete operations apply.
 
 ## Deleting a Platform

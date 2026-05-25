@@ -1,8 +1,8 @@
-# Webshare — webship-js feature scenarios
+# Webshare - webship-js feature scenarios
 
 | File | Tags | Covers |
 |------|------|--------|
-| `check-homepage.feature` | `@smoke` | Smoke test — the test site loads and the Webshare component is present. |
+| `check-homepage.feature` | `@smoke` | Smoke test - the test site loads and the Webshare component is present. |
 | `webshare-frontend.feature` | `@webshare @frontend` | Front-end render: SDC markup, default platforms (3 enabled), share URLs, native share button, `data-webshare-*` payload, JS-error check. |
 | `webshare-frontend-blog.feature` | `@webshare @frontend` | Front-end render on a blog node (vertical / rail-end placement). |
 | `webshare-backend.feature` | `@webshare @admin` | Back-end administration: `/admin/config/services/webshare` form loads, General + Platforms tabs, 5 platforms in the management table, Edit / Delete / Add modal links, save persists, no JS errors. |

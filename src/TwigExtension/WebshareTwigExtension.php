@@ -68,7 +68,7 @@ final class WebshareTwigExtension extends AbstractExtension {
 
     // Bubble cache metadata from the render-array build into the active
     // render context so the SDC / Canvas-rendered rail picks up the
-    // `webshare_platforms` cache tag — without this, enabling or disabling a
+    // `webshare_platforms` cache tag - without this, enabling or disabling a
     // platform never invalidates a Canvas-rendered share component. A
     // dedicated render-only-metadata marker array lets the renderer collect
     // the tags via its public API (no protected RenderContext access).

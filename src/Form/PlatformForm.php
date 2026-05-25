@@ -222,7 +222,7 @@ class PlatformForm extends FormBase {
     $values = $form_state->getValues();
     $platform_id = $values['platform_id'];
 
-    // Check if this is a new platform and requires an icon
+    // A new platform requires an icon (built-in platforms ship with one).
     $existing = $this->database
       ->select('webshare_platforms', 'wp')
       ->fields('wp')
@@ -232,6 +232,27 @@ class PlatformForm extends FormBase {
 
     if (!$existing && empty($values['icon'][0])) {
       $form_state->setError($form['icon'], $this->t('An icon is required for new platforms.'));
+    }
+
+    // A non-empty URL template must:
+    //  - use a safe scheme (https://, http://, or mailto:),
+    //  - contain the [url] placeholder so the substitution actually puts the
+    //    current page URL into the share link. An empty template means
+    //    copy-to-clipboard mode (the "Copy URL" platform).
+    $url_template = trim((string) ($values['url_template'] ?? ''));
+    if ($url_template !== '') {
+      if (!preg_match('/^(https?:\/\/|mailto:)/i', $url_template)) {
+        $form_state->setError(
+            $form['url_template'],
+            $this->t('The sharing URL template must start with https://, http:// or mailto:.'),
+        );
+      }
+      if (!str_contains($url_template, '[url]')) {
+        $form_state->setError(
+            $form['url_template'],
+            $this->t('The sharing URL template must include the [url] placeholder; otherwise the current page URL is never inserted into the share link.'),
+        );
+      }
     }
   }
 

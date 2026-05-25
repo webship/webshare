@@ -11,7 +11,7 @@ of that form and what it controls.
 
 You must have the **"Administer Webshare"** permission to reach the
 settings page. By default this is granted to the Administrator role
-only — see [Permissions](4-permissions.md) to assign it to other roles.
+only - see [Permissions](4-permissions.md) to assign it to other roles.
 
 ### Via Admin Menu
 
@@ -24,10 +24,10 @@ only — see [Permissions](4-permissions.md) to assign it to other roles.
 
 ## Form Structure
 
-The form has two sections (no vertical tabs — both are visible at once):
+The form has two sections (no vertical tabs - both are visible at once):
 
-1. **Platform management** — the drag-and-drop table of all platforms.
-2. **Add Custom Platform** — the AJAX-modal launcher for adding your
+1. **Platform management** - the drag-and-drop table of all platforms.
+2. **Add Custom Platform** - the AJAX-modal launcher for adding your
    own platforms.
 
 ## Platform Management Table
@@ -42,7 +42,7 @@ out of the box) with four columns:
 | Weight        | Drag handle. Lower weight = appears earlier in the rail.          |
 | Operations    | Dropbutton: **Edit** + **Delete** (both open AJAX modals).        |
 
-The table is `#tabledrag`-enabled — drag rows by the weight handle to
+The table is `#tabledrag`-enabled - drag rows by the weight handle to
 reorder. The form does not save until you click **Save configuration**.
 
 ### Built-in Default Set (post-install)
@@ -50,7 +50,7 @@ reorder. The form does not save until you click **Save configuration**.
 On a fresh install the following platforms are **enabled** in this
 order: LinkedIn, Facebook share, X. The remaining 10 (WhatsApp, Copy
 URL, Email, Telegram, Reddit, Pinterest, Threads, Bluesky, Tumblr,
-Mastodon) are listed but **disabled** — toggle their **Enabled**
+Mastodon) are listed but **disabled** - toggle their **Enabled**
 checkboxes and Save to add them to the rail.
 
 See [Managing Platforms](1-platforms.md) for the full per-platform
@@ -75,7 +75,7 @@ The module-level settings page contains only the cross-instance state:
 - The **weight** (order) per platform.
 - Custom platforms added through the modal.
 - The Drupal Core Icons API mapping
-  (see [Drupal Core Icons API](5-icons-api.md)) — these keys live in
+  (see [Drupal Core Icons API](5-icons-api.md)) - these keys live in
   `webshare.settings.icon_map` and are not exposed in the form by
   default. They are intended to be set via configuration import or
   in a deployment recipe.
@@ -98,9 +98,9 @@ via the modal.
 
 The configuration form mutates **two** stores:
 
-1. **Database** — `webshare_platforms` table (one row per platform).
+1. **Database** - `webshare_platforms` table (one row per platform).
    See [Database Schema](../3-developers/2-database-schema.md).
-2. **Drupal config** — `webshare.settings` (icon map + native share
+2. **Drupal config** - `webshare.settings` (icon map + native share
    icon mapping + legacy fallback button list).
 
 The platform table is intentionally stored in the database rather than

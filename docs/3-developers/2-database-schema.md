@@ -1,7 +1,7 @@
 # Database Schema
 
-Webshare stores its platforms in a single database table —
-`webshare_platforms` — rather than in config. The table is populated by
+Webshare stores its platforms in a single database table -
+`webshare_platforms` - rather than in config. The table is populated by
 `hook_install()` and updated by the platform CRUD forms.
 
 ## Why database, not config?
@@ -14,7 +14,7 @@ every save and force operators to commit per-environment fixtures into
 version control. The database table avoids both.
 
 The Drupal Core Icons API mapping (`icon_map`, `native_share_icon`) is
-the **only** cross-environment Webshare state — that does live in
+the **only** cross-environment Webshare state - that does live in
 config so it can be exported.
 
 ## Table: `webshare_platforms`
@@ -23,12 +23,12 @@ Defined in `webshare_schema()` in `webshare.install`:
 
 | Column         | Type            | Null | Default | Notes                                          |
 | -------------- | --------------- | ---- | ------- | ---------------------------------------------- |
-| `id`           | serial          | no   | —       | Primary key.                                   |
-| `platform_id`  | varchar(64)     | no   | —       | Machine name — unique. Indexed.                |
-| `name`         | varchar(255)    | no   | —       | Human-readable name (toolbar / table display). |
-| `title`        | varchar(255)    | no   | —       | `aria-label` / hover title on the share link.  |
+| `id`           | serial          | no   | -       | Primary key.                                   |
+| `platform_id`  | varchar(64)     | no   | -       | Machine name - unique. Indexed.                |
+| `name`         | varchar(255)    | no   | -       | Human-readable name (toolbar / table display). |
+| `title`        | varchar(255)    | no   | -       | `aria-label` / hover title on the share link.  |
 | `enabled`      | tinyint         | no   | 1       | 1 = enabled, 0 = disabled.                     |
-| `image`        | varchar(255)    | no   | —       | Path or filename of the platform icon (SVG).   |
+| `image`        | varchar(255)    | no   | -       | Path or filename of the platform icon (SVG).   |
 | `weight`       | int             | no   | 0       | `#tabledrag` ordering. Lower = earlier.        |
 | `url_template` | varchar(512)    | yes  | NULL    | Template with `[url]` / `[title]` tokens.      |
 | `is_custom`    | tinyint         | no   | 0       | 1 = added through the admin modal.             |
@@ -39,7 +39,7 @@ Defined in `webshare_schema()` in `webshare.install`:
 
 - **Primary key**: `id`.
 - **Unique key**: `platform_id`.
-- **Index `enabled_weight`**: `(enabled, weight)` — covers the
+- **Index `enabled_weight`**: `(enabled, weight)` - covers the
   default-sorted read query.
 
 ### URL Template Tokens
@@ -49,7 +49,7 @@ Defined in `webshare_schema()` in `webshare.install`:
 | Token     | Substituted with                                                |
 | --------- | --------------------------------------------------------------- |
 | `[url]`   | `rawurlencode($url)` (the current page absolute URL).           |
-| `[title]` | `rawurlencode($share_title)` — empty string when not provided.  |
+| `[title]` | `rawurlencode($share_title)` - empty string when not provided.  |
 
 A platform with an empty `url_template` is treated as a **clipboard
 button** (the Copy URL platform). It renders as a `<button>` instead of
@@ -67,7 +67,7 @@ inserts one row per entry. The post-install table looks like:
 | `facebook_share` | 1       | 1      | `https://www.facebook.com/sharer/sharer.php?u=[url]`         |
 | `x`              | 1       | 2      | `https://twitter.com/intent/tweet?url=[url]&text=[title]`    |
 | `whatsapp`       | 0       | 3      | `https://api.whatsapp.com/send?text=[title]%20[url]`         |
-| `copy`           | 0       | 4      | *(empty — clipboard mode)*                                   |
+| `copy`           | 0       | 4      | *(empty - clipboard mode)*                                   |
 | `email`          | 0       | 5      | `mailto:?subject=[title]&body=[url]`                         |
 | `telegram`       | 0       | 6      | `https://t.me/share/url?url=[url]&text=[title]`              |
 | `reddit`         | 0       | 7      | `https://www.reddit.com/submit?url=[url]&title=[title]`      |
@@ -81,13 +81,13 @@ inserts one row per entry. The post-install table looks like:
 
 Existing schema migrations in `webshare.install`:
 
-- `webshare_update_8001()` — creates the `webshare_platforms` table
+- `webshare_update_8001()` - creates the `webshare_platforms` table
   (legacy upgrade path from the pre-2.0.x config-only storage).
-- `webshare_update_8002()` — reorders default platforms to match the
+- `webshare_update_8002()` - reorders default platforms to match the
   approved 2.0.x design (LinkedIn, Facebook, X first).
-- `webshare_update_8003()` — migrates `alignment` config values from
+- `webshare_update_8003()` - migrates `alignment` config values from
   `left` / `right` (legacy) to `start` / `end` (logical).
-- `webshare_update_8004()` — initialises empty `icon_map` and
+- `webshare_update_8004()` - initialises empty `icon_map` and
   `native_share_icon` config keys.
 
 Run any pending hooks with:

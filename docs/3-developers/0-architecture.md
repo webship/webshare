@@ -59,14 +59,14 @@ the same set of props.
 └─────────────────────────┘
 ```
 
-### Path 1 — The Share block
+### Path 1 - The Share block
 
 `WebshareBlock::build()` ([src/Plugin/Block/WebshareBlock.php][block])
 collects the per-instance settings (heading, alignment, orientation,
 …), calls `WebshareService::build($url, $id, $options)`, and returns
 the resulting render array. The block plugin id is `share`.
 
-### Path 2 — Drupal Canvas
+### Path 2 - Drupal Canvas
 
 The SDC is auto-exposed as `sdc.webshare.share` to Canvas's component
 catalogue. When Canvas renders the component, its Twig template calls
@@ -74,7 +74,7 @@ the `webshare_share_data(url, options)` Twig function (registered by
 `WebshareTwigExtension`) to obtain the resolved share URL and the
 enabled platform link list from `WebshareService::build()`.
 
-### Path 3 — Custom Twig embed
+### Path 3 - Custom Twig embed
 
 A theme or sibling module can call the SDC directly:
 
@@ -87,10 +87,10 @@ A theme or sibling module can call the SDC directly:
 ```
 
 The Twig's `_share_data` fallback fills in the resolved `url` and
-`platforms` array from the Webshare service — the embed only needs to
+`platforms` array from the Webshare service - the embed only needs to
 pass the presentation props.
 
-## Single Source of Truth — WebshareService
+## Single Source of Truth - WebshareService
 
 [`WebshareService::build()`][service] is the one place that:
 
@@ -107,7 +107,7 @@ pass the presentation props.
 
 Every rendering path goes through this method (block, Canvas, custom
 Twig). Cache tag bubbling is handled by the render array's `#cache`
-block — see [API Reference](1-api-reference.md#cache-tag-webshare_platforms).
+block - see [API Reference](1-api-reference.md#cache-tag-webshare_platforms).
 
 ## Cache Strategy
 
@@ -126,15 +126,15 @@ The share rail has two cache concerns:
 
 This means a single edit on `/admin/config/services/webshare`
 invalidates the anonymous page cache for every page that contains a
-share rail — block, Canvas, or otherwise.
+share rail - block, Canvas, or otherwise.
 
 ## Next
 
-- [API Reference](1-api-reference.md) — class signatures + Twig
+- [API Reference](1-api-reference.md) - class signatures + Twig
   function.
-- [Database Schema](2-database-schema.md) — the `webshare_platforms`
+- [Database Schema](2-database-schema.md) - the `webshare_platforms`
   table.
-- [The Share SDC Component](3-sdc-component.md) — props, defaults, and
+- [The Share SDC Component](3-sdc-component.md) - props, defaults, and
   Twig contract.
 
 [block]: https://git.drupalcode.org/project/webshare/-/blob/2.0.x/src/Plugin/Block/WebshareBlock.php

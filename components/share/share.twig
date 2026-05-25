@@ -33,7 +33,7 @@
 #}
 {# When rendered through Drupal Canvas the SDC receives no `platforms`/`url`
    (the array-of-objects `platforms` prop is intentionally undeclared so the
-   component is eligible for the Canvas library — see share.component.yml).
+   component is eligible for the Canvas library - see share.component.yml).
    Fall back to the Webshare service via the `webshare_share_data()` Twig
    function, which resolves the current page's share URL and the enabled
    platform links. A caller that DOES supply data (legacy block, custom code)
@@ -55,11 +55,14 @@
    accessibility). #}
 {% set _show_heading = (display_title is not defined or display_title) and heading %}
 
+{# Twig defaults below mirror share.component.yml so the component renders
+   consistently whether reached through the service, the SDC schema, or a
+   bare Twig embed. #}
 {% set classes = [
   'webshare',
-  'webshare--' ~ (orientation|default('horizontal')),
-  'webshare--' ~ (placement|default('inline')),
-  'webshare--align-' ~ (alignment|default('start')),
+  'webshare--' ~ (orientation|default('vertical')),
+  'webshare--' ~ (placement|default('rail-end')),
+  'webshare--align-' ~ (alignment|default('end')),
   mobile_visibility == 'hide_mobile' ? 'webshare--hide-mobile',
   mobile_visibility == 'mobile_only' ? 'webshare--mobile-only',
 ] %}

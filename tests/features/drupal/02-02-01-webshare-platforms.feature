@@ -1,5 +1,5 @@
 @webshare @frontend @platforms
-Feature: Webshare module — every platform share endpoint
+Feature: Webshare module - every platform share endpoint
   As a content owner
   I want each social network button to point at the correct share endpoint
   So that visitors reach the right platform with the page URL pre-filled

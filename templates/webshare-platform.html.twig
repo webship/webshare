@@ -25,7 +25,7 @@
 {% set icon %}<span aria-hidden="true">{{ content }}</span>{% endset %}
 {% if platform %}
   {% if platform.url_template is empty %}
-    {# Copy URL — a real <button> for correct a11y semantics. #}
+    {# Copy URL - a real <button> for correct a11y semantics. #}
     <button type="button" class="webshare-copy-url" data-url="{{ url }}" data-clipboard="{{ url }}" aria-label="{{ platform.title|default('Copy URL'|t) }}">{{ icon }}</button>
   {% else %}
     {% set sharing_url = platform.url_template|replace({'[url]': url|url_encode, '[title]': page_title|url_encode}) %}

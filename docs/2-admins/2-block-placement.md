@@ -54,7 +54,7 @@ column. Pick whichever fits the region you placed the block into.
 
 ### Placement: inline vs rail-end
 
-- `inline` keeps the rail in the normal content flow — it sits where
+- `inline` keeps the rail in the normal content flow - it sits where
   the block is placed in the region. Best for top-of-article share
   bars.
 - `rail-end` makes the rail a sticky column floating beside the
@@ -65,9 +65,9 @@ column. Pick whichever fits the region you placed the block into.
 
 ### Mobile Visibility
 
-- `all` — visible at every viewport (default).
-- `hide_mobile` — hidden at viewports ≤ 768px.
-- `mobile_only` — visible only at viewports ≤ 768px.
+- `all` - visible at every viewport (default).
+- `hide_mobile` - hidden at viewports ≤ 768px.
+- `mobile_only` - visible only at viewports ≤ 768px.
 
 The breakpoint is the same 768px Drupal uses for the Olivero theme.
 
@@ -98,7 +98,7 @@ settings per region. Each placement has its own machine-name-derived
 DOM id (`#block-<machine-name>`), so CSS and assertions can target
 each individually.
 
-The webship-js test suite uses exactly this pattern — see the
+The webship-js test suite uses exactly this pattern - see the
 [Testing guide](../3-developers/5-testing.md).
 
 ## Removing a Block

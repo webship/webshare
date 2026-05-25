@@ -34,9 +34,9 @@ admin route under `/admin/config/services/webshare/*`.
 ### Default Assignments
 
 On a fresh install only the **Administrator** role (which by default
-has *all* permissions) holds this permission. Standard roles —
+has *all* permissions) holds this permission. Standard roles -
 *Anonymous user*, *Authenticated user*, and the Standard-profile
-*Content editor* — do not.
+*Content editor* - do not.
 
 The Webshare automated test suite asserts exactly this matrix in
 `tests/features/drupal/04-01-01-access-control.feature`.
@@ -44,7 +44,7 @@ The Webshare automated test suite asserts exactly this matrix in
 ## What Doesn't Require This Permission
 
 - **Viewing** the rendered share rail on the front end. The rail is
-  rendered for any visitor — anonymous or authenticated.
+  rendered for any visitor - anonymous or authenticated.
 - **Placing the Share block** in a region. This requires the
   *Administer blocks* permission, which is a separate (core) right.
 - **Placing the Share component in Canvas**. This requires the

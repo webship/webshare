@@ -1,6 +1,6 @@
 # Extending Webshare
 
-Webshare is intentionally compact — most extension work happens through
+Webshare is intentionally compact - most extension work happens through
 **data** (platforms in the database, icon mappings in config) rather
 than through plugins or events. This page collects the most common
 extension scenarios.
@@ -29,7 +29,7 @@ table (`hook_install()` / `hook_update_N()` / a deployment recipe):
 \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
 ```
 
-Mind the cache-tag invalidation at the end — otherwise existing
+Mind the cache-tag invalidation at the end - otherwise existing
 anonymous-cache entries will keep rendering the rail without the new
 platform.
 
@@ -112,13 +112,13 @@ Override them from your theme without forking the SDC:
 
 For deeper changes (extra markup around each list item, alternative
 heading element, etc.), copy `components/share/share.twig` into your
-theme's `components/webshare/share/` directory — Drupal core's SDC
+theme's `components/webshare/share/` directory - Drupal core's SDC
 theme-override discovery will pick it up.
 
 ## Embedding the SDC From Custom Twig
 
 ```twig
-{# Minimal — service fills in platforms + url. #}
+{# Minimal - service fills in platforms + url. #}
 {% embed 'webshare:share' with {
   heading: 'Share',
   orientation: 'horizontal',
@@ -127,7 +127,7 @@ theme-override discovery will pick it up.
 ```
 
 Useful when a theme wants to place the rail in a region without going
-through the Block layout UI — for example, in the same Twig file as
+through the Block layout UI - for example, in the same Twig file as
 the page title.
 
 ## Hooking Into a Share Click (JS)

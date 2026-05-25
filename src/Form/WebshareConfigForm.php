@@ -255,8 +255,8 @@ class WebshareConfigForm extends ConfigFormBase
     }
 
       // Invalidate the shared platform cache tag so every cached rendering of
-      // the share rail — including the anonymous page cache, which the tag
-      // bubbles up to — picks up the new enabled/weight values.
+      // the share rail - including the anonymous page cache, which the tag
+      // bubbles up to - picks up the new enabled/weight values.
       \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
       parent::submitForm($form, $form_state);
   }

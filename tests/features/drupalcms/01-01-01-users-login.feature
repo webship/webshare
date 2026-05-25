@@ -6,7 +6,7 @@ Feature: Provision the Webshare Drupal CMS test users
 
   # The Webshare Share component is placed in the Mercury header and footer
   # Canvas page_region entities (`mercury.header` / `mercury.footer`) at
-  # site-setup time — classic block placement does not apply on a Canvas-
+  # site-setup time - classic block placement does not apply on a Canvas-
   # rendered Drupal CMS front page. See the `webship-js-test-drupal-cms`
   # job's before_script in .gitlab-ci.yml.
 

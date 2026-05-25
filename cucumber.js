@@ -1,8 +1,8 @@
-// Default cucumber-js config — runs the Drupal Standard suite.
+// Default cucumber-js config - runs the Drupal Standard suite.
 //
 // The Webshare feature set is split by Drupal flavour:
-//   tests/features/drupal/      — Drupal Standard profile (Olivero theme)
-//   tests/features/drupalcms/   — Drupal CMS distribution (Mercury theme)
+//   tests/features/drupal/      - Drupal Standard profile (Olivero theme)
+//   tests/features/drupalcms/   - Drupal CMS distribution (Mercury theme)
 //
 // This config loads only the `drupal/` features. The Drupal CMS suite lives
 // in `cucumber.drupalcms.js`:

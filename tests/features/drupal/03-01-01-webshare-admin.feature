@@ -1,5 +1,5 @@
 @webshare @admin
-Feature: Webshare module — back-end administration
+Feature: Webshare module - back-end administration
   As a site administrator
   I want to manage the Webshare platforms and settings
   So that I can enable networks, reorder them, and save the configuration

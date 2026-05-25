@@ -23,7 +23,7 @@ Schema is declared in `components/share/share.component.yml`. The keys
 below are the **publicly documented props** intended for callers
 (block, Canvas, Twig embed). A few props (`webshare_links_id`,
 `native_label`, `native_icon`, `native_icon_html`) are intentionally
-undeclared in the schema — they are implementation details handled by
+undeclared in the schema - they are implementation details handled by
 the Twig's `|default(...)` filters and are filled in by
 `WebshareService::build()` or `webshare_share_data()`.
 
@@ -40,7 +40,7 @@ the Twig's `|default(...)` filters and are filled in by
 | `share_title`       | string  | `''`         | Forwarded to Web Share API + `[title]` token. |
 | `share_text`        | string  | `''`         | Forwarded to Web Share API.                 |
 
-The `platforms` array prop is **deliberately undeclared** — Drupal
+The `platforms` array prop is **deliberately undeclared** - Drupal
 Canvas cannot match an array-of-objects shape to a field widget, so
 declaring it would disqualify the SDC from the Canvas component
 catalogue. The Twig falls back to the `webshare_share_data()` Twig
@@ -66,10 +66,10 @@ Inside `share.twig`:
 
 This means callers can either:
 
-1. **Pass `platforms` + `url` directly** — full control, no service
+1. **Pass `platforms` + `url` directly** - full control, no service
    call. This is what `WebshareBlock` / `WebshareService::build()`
    does.
-2. **Pass only the presentation props** — `platforms` and `url` are
+2. **Pass only the presentation props** - `platforms` and `url` are
    resolved by the Twig function. This is what Drupal Canvas does.
 
 ## DOM Output
@@ -118,14 +118,14 @@ output (typically an inline `<svg>`).
 ## Using the SDC From Custom Twig
 
 ```twig
-{# Minimal — service fills in platforms + url #}
+{# Minimal - service fills in platforms + url #}
 {% embed 'webshare:share' with {
   heading: 'Share this story',
   orientation: 'horizontal',
   native_share: true,
 } only %}{% endembed %}
 
-{# Full control — pass everything #}
+{# Full control - pass everything #}
 {% set my_platforms = [
   { key: 'linkedin', url: 'https://...', title: 'Share on LinkedIn',
     icon_src: '/path/to/icon.svg', icon_html: '', icon_alt: 'Share',

@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -40,8 +41,8 @@ class WebshareService implements WebshareServiceInterface {
   /**
    * The Drupal Core Icon Pack plugin manager, when available.
    *
-   * Provided by Drupal core (11.1+) — and also by the `ui_icons` contrib
-   * module on older sites — under the `plugin.manager.icon_pack` service
+   * Provided by Drupal core (11.1+) - and also by the `ui_icons` contrib
+   * module on older sites - under the `plugin.manager.icon_pack` service
    * id. We hold a nullable reference so the module works on Drupal versions
    * that pre-date the Icons API.
    *
@@ -57,6 +58,13 @@ class WebshareService implements WebshareServiceInterface {
   protected $renderer;
 
   /**
+   * The logger channel factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface|null
+   */
+  protected $loggerFactory;
+
+  /**
    * Constructs an WebshareService object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -70,6 +78,8 @@ class WebshareService implements WebshareServiceInterface {
    * @param \Drupal\Component\Plugin\PluginManagerInterface|null $icon_pack_manager
    *   The Icon Pack plugin manager. NULL when neither Drupal Core 11.1+
    *   nor the ui_icons contrib module is enabled.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface|null $logger_factory
+   *   Optional logger factory used to record database read failures.
    */
   public function __construct(
       ConfigFactoryInterface $config_factory,
@@ -77,12 +87,14 @@ class WebshareService implements WebshareServiceInterface {
       Connection $database,
       ?RendererInterface $renderer = NULL,
       $icon_pack_manager = NULL,
+      ?LoggerChannelFactoryInterface $logger_factory = NULL,
   ) {
     $this->configFactory = $config_factory;
     $this->moduleExtensionList = $module_extension_list;
     $this->database = $database;
     $this->renderer = $renderer ?: \Drupal::service('renderer');
     $this->iconPackManager = $icon_pack_manager;
+    $this->loggerFactory = $logger_factory;
   }
 
   /**
@@ -100,6 +112,7 @@ class WebshareService implements WebshareServiceInterface {
         $container->has('plugin.manager.icon_pack')
         ? $container->get('plugin.manager.icon_pack')
         : NULL,
+        $container->has('logger.factory') ? $container->get('logger.factory') : NULL,
     );
   }
 
@@ -110,11 +123,10 @@ class WebshareService implements WebshareServiceInterface {
     global $base_url;
     $config = $this->configFactory->get('webshare.settings');
     $module_path = $this->moduleExtensionList->getPath('webshare');
-    $buttons = [];
 
     // Resolve presentation options. Heading / alignment / orientation /
     // mobile_visibility / placement / native_share all live on the block
-    // (and any future callers) — the module config no longer carries them.
+    // (and any future callers) - the module config no longer carries them.
     $alignment = $options['alignment'] ?? 'end';
     if (!in_array($alignment, ['start', 'end'], TRUE)) {
       $alignment = 'end';
@@ -133,7 +145,9 @@ class WebshareService implements WebshareServiceInterface {
       $placement = 'rail-end';
     }
 
-    // Get enabled platforms from database (fallback to config if table doesn't exist)
+    // Read enabled platforms from the database (falling back to the legacy
+    // `buttons` config when the table is missing - early bootstrap, or sites
+    // upgrading from the 1.x storage model).
     $platforms = [];
     try {
       if ($this->database->schema()->tableExists('webshare_platforms')) {
@@ -147,7 +161,16 @@ class WebshareService implements WebshareServiceInterface {
           ->fetchAll();
       }
     } catch (\Exception $e) {
-      // If database access fails, fall back to empty array
+      // DB access failed for a reason other than a missing table (locked
+      // table, permission error, schema mismatch, etc.). Log so the failure
+      // surfaces in /admin/reports/dblog rather than appearing as an empty
+      // share rail with no diagnostic trail.
+      if ($this->loggerFactory) {
+        $this->loggerFactory->get('webshare')->warning(
+            'Could not read enabled platforms from webshare_platforms: @message',
+            ['@message' => $e->getMessage()],
+        );
+      }
     }
 
     // Fallback to legacy config if no platforms in database
@@ -179,7 +202,7 @@ class WebshareService implements WebshareServiceInterface {
       $key = $platform->platform_id;
       $is_copy = empty($platform->url_template);
 
-      // Resolve share URL — placeholder substitution for templated platforms;
+      // Resolve share URL - placeholder substitution for templated platforms;
       // '#' for the copy-to-clipboard platform (JS handles the click).
       $share_url = '#';
       if (!$is_copy) {
@@ -250,7 +273,7 @@ class WebshareService implements WebshareServiceInterface {
       // The rendered rail depends on the enabled platform set (the
       // `webshare_platforms` table) and on the module settings (icon map,
       // native share icon). Tag the output so enabling / disabling a
-      // platform or editing the settings invalidates the cached markup —
+      // platform or editing the settings invalidates the cached markup -
       // including the anonymous page cache, which the tags bubble up to.
       // The share URL is per-request, so vary by the `url` context.
       '#cache' => [

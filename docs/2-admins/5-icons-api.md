@@ -5,7 +5,7 @@ Webshare can render its platform and native-share icons through Drupal's
 [`ui_icons`][ui_icons] contrib module on older sites) instead of the
 bundled SVGs.
 
-This is optional — out of the box Webshare uses the SVG files shipped
+This is optional - out of the box Webshare uses the SVG files shipped
 in `web/modules/contrib/webshare/img/` and the Icons API integration
 stays inert.
 
@@ -48,7 +48,7 @@ webshare.settings:
 ```
 
 Any platform id from the [platforms table](1-platforms.md) is a valid
-key — including custom platforms you added through the modal. Platforms
+key - including custom platforms you added through the modal. Platforms
 without an entry continue to render their stored SVG.
 
 ### `native_share_icon`
@@ -76,7 +76,7 @@ time:
 2. Look up `pack_id` in the registered pack definitions. If the pack is
    not registered (e.g. because the icon-pack module is not enabled),
    return an empty string → fall back to the bundled SVG.
-3. Render `#type: icon` with the `pack_id` + `icon_id` — its output
+3. Render `#type: icon` with the `pack_id` + `icon_id` - its output
    replaces the `<img>` in the rendered list item.
 
 The fallback is **per-platform**: if `facebook_share` has an icon
@@ -110,7 +110,7 @@ drush cset webshare.settings icon_map.linkedin.icon linkedin
 
 ## Themes and Recipes
 
-Webshare is intentionally icon-library-agnostic — the bundled SVGs are
+Webshare is intentionally icon-library-agnostic - the bundled SVGs are
 serviceable but plain. A theme or distribution can ship a config
 **preset** that wires `icon_map` to its preferred pack:
 

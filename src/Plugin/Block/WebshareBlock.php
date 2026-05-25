@@ -185,7 +185,7 @@ class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface
       $url = Url::fromRoute('<current>');
       $id = str_replace('/', '', $this->aliasManager->getPathByAlias($url->toString()));
 
-      // Heading / display_title / alignment now live on the block itself —
+      // Heading / display_title / alignment now live on the block itself -
       // pass them through as service options so the component receives them
       // as props.
       $heading = '';

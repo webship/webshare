@@ -1,7 +1,7 @@
 # Drupal Canvas Integration (Developer)
 
 This page documents how Webshare integrates with [Drupal Canvas][canvas]
-at the code level — for the administrator-facing flow see the
+at the code level - for the administrator-facing flow see the
 [admin Canvas guide](../2-admins/3-canvas-integration.md).
 
 ## How the SDC is Exposed
@@ -116,13 +116,13 @@ To keep `webshare:share` discoverable, the schema deliberately omits
 `platforms` and `webshare_links_id`. The Twig fills them in via the
 `webshare_share_data()` Twig function whenever the inputs do not
 supply them. The block plugin, in contrast, builds the props
-explicitly and supplies the full array — both paths render the same
+explicitly and supplies the full array - both paths render the same
 markup.
 
 ## Cache Tag Bubbling
 
 When Canvas renders an SDC, it does **not** call
-`WebshareService::build()` — instead it calls the Twig template
+`WebshareService::build()` - instead it calls the Twig template
 directly with the prop inputs. The Twig then calls
 `webshare_share_data(url, options)`, which invokes
 `WebshareService::build()` for its side effect (the render array) and

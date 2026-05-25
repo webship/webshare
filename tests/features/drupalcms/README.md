@@ -17,7 +17,7 @@ LAUNCH_URL=http://<site>:<port> npx cucumber-js --config cucumber.drupalcms.js
 - Mercury exposes only `content / header / footer` regions, and the
   `content` region is owned by Canvas-driven page content. The Webshare
   Share component is therefore added to the **Canvas page_region**
-  entities (`mercury.header` / `mercury.footer`) at site-setup time —
+  entities (`mercury.header` / `mercury.footer`) at site-setup time -
   classic block-layout placement does not render on Canvas-managed
   pages. The CI `before_script` for `webship-js-test-drupal-cms` seeds
   those page_regions; local DDEV mirrors the same drush call.

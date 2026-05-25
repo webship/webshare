@@ -1,5 +1,5 @@
 @webshare @frontend
-Feature: Webshare module — front-end rendering
+Feature: Webshare module - front-end rendering
   As a site visitor
   I want to see social sharing buttons rendered by the Webshare module
   So that I can share the page on social platforms or through my device

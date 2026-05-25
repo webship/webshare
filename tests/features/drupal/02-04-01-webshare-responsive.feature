@@ -1,5 +1,5 @@
 @webshare @responsive @frontend
-Feature: Webshare module — responsive share rail
+Feature: Webshare module - responsive share rail
   As a visitor on any device
   I want the share rail to render across breakpoints
   So that I can share the page on mobile and desktop alike

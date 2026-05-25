@@ -9,7 +9,7 @@ Common questions about installing, configuring, and extending Webshare.
 A Drupal module that renders a social-sharing rail (icons + links to
 LinkedIn, Facebook, X, etc.) as a Single-Directory Component. It can be
 placed as a classic block, as a Drupal Canvas component, or embedded
-directly from custom Twig — the same component drives all three paths.
+directly from custom Twig - the same component drives all three paths.
 
 ### Which Drupal versions are supported?
 
@@ -24,7 +24,7 @@ still usable via the classic block plugin and custom Twig.
 
 ### Does Webshare work on Drupal CMS?
 
-Yes — Webshare is tested against the `drupal/cms` distribution
+Yes - Webshare is tested against the `drupal/cms` distribution
 (Mercury theme) on every push. Because Mercury delegates header /
 footer rendering to Canvas's `page_region` entities, the rail on
 Drupal CMS is placed by adding `sdc.webshare.share` to those
@@ -37,7 +37,7 @@ both cover this.
 
 ### Where are the settings?
 
-`/admin/config/services/webshare` — under **Configuration > Web
+`/admin/config/services/webshare` - under **Configuration > Web
 services**. You need the *Administer Webshare* permission.
 
 ### Where are presentation settings (heading, alignment, orientation)?
@@ -50,7 +50,7 @@ with different presentations.
 
 In the `webshare_platforms` database table (one row per platform).
 Custom platforms added through the modal also live there. This is
-intentional — see [Database Schema](3-developers/2-database-schema.md).
+intentional - see [Database Schema](3-developers/2-database-schema.md).
 
 ### How do I add a custom platform without writing code?
 
@@ -60,7 +60,7 @@ modal (name, title, URL template, icon), and Save. See
 
 ### Can I export the platform table with config?
 
-No — the platforms live in the database, not config. If you need
+No - the platforms live in the database, not config. If you need
 deterministic platform state across environments, ship the rows from
 a `hook_install()` or recipe. See
 [Extending Webshare](3-developers/6-extending.md#shipping-a-recipe-distribution-preset).
@@ -89,7 +89,7 @@ individually. The webship-js test suite uses exactly this pattern.
 ### My block visibility doesn't match the front page on Drupal CMS.
 
 Drupal CMS's homepage is a Canvas page (`/page/1` aliased to `<front>`)
-and Mercury delegates header/footer to Canvas page_regions —
+and Mercury delegates header/footer to Canvas page_regions -
 **classic block placement does not render at all on Canvas-managed
 pages**. Use the
 [Canvas integration path](2-admins/3-canvas-integration.md) instead.
@@ -126,7 +126,7 @@ the Administrator role only. You can assign it to other roles via
 
 ### What permission do I need to place the Share block?
 
-The standard **Administer blocks** permission — independent of the
+The standard **Administer blocks** permission - independent of the
 *Administer Webshare* permission. A site builder can place Share
 blocks without being able to add custom platforms, and vice versa.
 
@@ -134,7 +134,7 @@ blocks without being able to add custom platforms, and vice versa.
 
 ### Can I use Bootstrap Icons / Phosphor / Font Awesome instead of the bundled SVGs?
 
-Yes — Webshare integrates with the [Drupal Core Icons API][icons]
+Yes - Webshare integrates with the [Drupal Core Icons API][icons]
 (Drupal 11.1+) or the `ui_icons` contrib module. Map each platform to
 a `pack` + `icon` reference in `webshare.settings.icon_map`. See
 [Drupal Core Icons API](2-admins/5-icons-api.md).
@@ -158,13 +158,13 @@ actually registered.
 
 You need a DDEV test site with the module installed. See
 [Testing](3-developers/5-testing.md#running-the-suite-locally). Two
-parallel sites exist on the development machine —
-`drupal11webshare` (Standard) and `drupalcms2webshare` (Drupal CMS) —
+parallel sites exist on the development machine -
+`drupal11webshare` (Standard) and `drupalcms2webshare` (Drupal CMS) -
 plus the suite is also runnable inside the canonical module repo.
 
 ### Are the tests pure browser-driven?
 
-Yes. Every Cucumber step uses Playwright — no Drush, no shell, no
+Yes. Every Cucumber step uses Playwright - no Drush, no shell, no
 PHP scripts. Site-state setup that can't be done via the UI (Drupal
 install, Canvas content-entity seeding) is handled by the CI
 `before_script` (or a local dev script), never by a Cucumber step.

@@ -1,5 +1,5 @@
 @webshare @admin @access
-Feature: Webshare module — administration access control
+Feature: Webshare module - administration access control
   As a site owner
   I want only users with the "administer webshare" permission to reach settings
   So that the share configuration cannot be changed by regular users

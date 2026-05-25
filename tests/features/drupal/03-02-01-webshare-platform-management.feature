@@ -1,5 +1,5 @@
 @webshare @admin @modal
-Feature: Webshare module — add and edit platforms in a modal
+Feature: Webshare module - add and edit platforms in a modal
   As a site administrator
   I want to add custom platforms and edit existing ones in a dialog
   So that I can extend the share rail without leaving the settings page

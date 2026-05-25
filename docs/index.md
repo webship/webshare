@@ -2,7 +2,7 @@
 
 A Drupal module that adds social-sharing buttons to your site as a
 Single-Directory Component (SDC), a placeable Block, and a Drupal Canvas
-component — with smart defaults, native-share support, and a
+component - with smart defaults, native-share support, and a
 no-Javascript-required configuration UI.
 
 ## What is Webshare?
@@ -22,14 +22,14 @@ component on a Canvas page or content template, or directly via the
 ### Key Features
 
 - **Single source of truth**: One SDC component (`webshare:share`)
-  renders the rail wherever it is placed — block, Canvas page, content
+  renders the rail wherever it is placed - block, Canvas page, content
   template, or custom Twig.
 - **13 platforms out of the box**: LinkedIn, Facebook, X, WhatsApp,
   Copy URL, Email, Telegram, Reddit, Pinterest, Threads, Bluesky,
   Tumblr, Mastodon. Three (LinkedIn, Facebook, X) are enabled on a
   fresh install; the rest can be toggled on per site.
 - **Custom platforms**: Site builders can add their own platforms
-  through the Webshare settings form — no code required.
+  through the Webshare settings form - no code required.
 - **Drupal Canvas-native**: The component is exposed to Drupal Canvas
   as `sdc.webshare.share` so it can be placed via the Canvas editor.
 - **Native Web Share API**: Optional native share button that opens the
@@ -48,48 +48,48 @@ component on a Canvas page or content template, or directly via the
 If you visit a Webshare-enabled site or are tasked with placing the share
 rail on content:
 
-- [Installation and Setup](1-users/0-installation.md) — install Webshare and
+- [Installation and Setup](1-users/0-installation.md) - install Webshare and
   enable the module.
-- [Using the Share Rail](1-users/1-using-the-share-rail.md) — what each
+- [Using the Share Rail](1-users/1-using-the-share-rail.md) - what each
   button does and how the native share sheet behaves.
-- [Content Editor Guide](1-users/2-content-editor-guide.md) — placing the
+- [Content Editor Guide](1-users/2-content-editor-guide.md) - placing the
   rail on a page, a Canvas page, or a content view mode.
 
 ### For Site Administrators
 
 If you're configuring Webshare for your site:
 
-- [Configuration](2-admins/0-configuration.md) — find the settings form
+- [Configuration](2-admins/0-configuration.md) - find the settings form
   and what every setting does.
-- [Managing Platforms](2-admins/1-platforms.md) — enable / disable /
+- [Managing Platforms](2-admins/1-platforms.md) - enable / disable /
   reorder built-in platforms and add custom ones.
-- [Block Placement](2-admins/2-block-placement.md) — place the Share
+- [Block Placement](2-admins/2-block-placement.md) - place the Share
   block in any theme region with the block layout UI.
-- [Drupal Canvas Integration](2-admins/3-canvas-integration.md) — use
+- [Drupal Canvas Integration](2-admins/3-canvas-integration.md) - use
   the Share component on Canvas pages and content templates.
-- [Permissions](2-admins/4-permissions.md) — who can administer
+- [Permissions](2-admins/4-permissions.md) - who can administer
   Webshare.
-- [Drupal Core Icons API](2-admins/5-icons-api.md) — wire the rail to a
+- [Drupal Core Icons API](2-admins/5-icons-api.md) - wire the rail to a
   registered icon pack.
 
 ### For Developers
 
 If you're extending Webshare or integrating it into a theme:
 
-- [Architecture Overview](3-developers/0-architecture.md) — module layout
+- [Architecture Overview](3-developers/0-architecture.md) - module layout
   + the three rendering paths.
-- [API Reference](3-developers/1-api-reference.md) — `WebshareService`,
+- [API Reference](3-developers/1-api-reference.md) - `WebshareService`,
   the `webshare_share_data()` Twig function, and cache metadata.
-- [Database Schema](3-developers/2-database-schema.md) — the
+- [Database Schema](3-developers/2-database-schema.md) - the
   `webshare_platforms` table.
-- [The Share SDC Component](3-developers/3-sdc-component.md) — props,
+- [The Share SDC Component](3-developers/3-sdc-component.md) - props,
   defaults, and what the Twig expects.
-- [Drupal Canvas Integration](3-developers/4-canvas-integration.md) —
+- [Drupal Canvas Integration](3-developers/4-canvas-integration.md) -
   how the SDC is exposed to Canvas, page_region and content_template
   examples.
-- [Testing](3-developers/5-testing.md) — running the webship-js suite
+- [Testing](3-developers/5-testing.md) - running the webship-js suite
   (Drupal Standard + Drupal CMS).
-- [Extending Webshare](3-developers/6-extending.md) — adding platforms
+- [Extending Webshare](3-developers/6-extending.md) - adding platforms
   programmatically, custom icons, theming the rail.
 
 ## Frequently Asked Questions

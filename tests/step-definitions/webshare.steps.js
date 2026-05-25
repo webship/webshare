@@ -5,13 +5,13 @@
  * Custom step definitions for the Webshare module test suite.
  *
  * Mirrors the sibling Webship modules (webpage / webblog / webseo): every
- * step drives the site through the browser only — no Drush, no shell. Site
+ * step drives the site through the browser only - no Drush, no shell. Site
  * provisioning beyond what these steps cover (Drupal install, module enable,
  * Canvas fixtures) is handled by the CI before_script.
  *
- * Navigation and waiting reuse webship-js's own helpers — gotoUrl (friendly
+ * Navigation and waiting reuse webship-js's own helpers - gotoUrl (friendly
  * navigation errors) and waitForPageLoad (BBR smart-settle: DOM ready,
- * network idle, no pending AJAX/timers, DOM-quiet) — instead of raw
+ * network idle, no pending AJAX/timers, DOM-quiet) - instead of raw
  * Playwright waits, and failures are wrapped with friendly().
  */
 
@@ -62,7 +62,7 @@ Given(/^I am a logged in user with( the)*( username)* "([^"]*)?"( user)?$/, asyn
     await gotoUrl(this.page, `${this.parameters.launchUrl}/user/login`);
     // Use Drupal's stable field IDs so the step is theme-independent:
     // Olivero's label is "Username", Drupal CMS's Gin theme renders
-    // "Username or email address" — getByLabel('Username') is ambiguous.
+    // "Username or email address" - getByLabel('Username') is ambiguous.
     await this.page.locator('#edit-name').fill(username);
     await this.page.locator('#edit-pass').fill(password);
     await this.page.locator('input[value="Log in"]').click();
@@ -89,7 +89,7 @@ Given(/^(?:I |we )?add( the)? testing users$/, async function (theCase) {
       await gotoUrl(this.page, `${this.parameters.launchUrl}/admin/people/create`);
       // Fill values + tick role checkboxes via JS. Drupal CMS's Gin theme
       // wraps the password-confirm widget in an `is-initial` collapsed state
-      // that hides the password inputs until an interaction event fires — a
+      // that hides the password inputs until an interaction event fires - a
       // normal Playwright fill() then fails actionability. Setting `.value`
       // in the page context bypasses the hidden-input check, and the form
       // posts the assigned values just the same.
@@ -126,13 +126,13 @@ async function detectTheme(world) {
 
 /**
  * Place one Share block (fixed machine id) in a region, scoped to the front
- * page, with the settings the suite expects. Idempotent — removes any prior
+ * page, with the settings the suite expects. Idempotent - removes any prior
  * instance with the same id first.
  */
 async function placeShareBlock(world, theme, id, region) {
   const base = world.parameters.launchUrl;
   // Remove any prior instance with this id so re-runs stay deterministic.
-  // A missing block 404s — and Olivero's 404 page carries a Search form whose
+  // A missing block 404s - and Olivero's 404 page carries a Search form whose
   // submit is also #edit-submit, so match the confirm form's "Remove" button.
   await gotoUrl(world.page, `${base}/admin/structure/block/manage/${id}/delete`);
   const removeBtn = world.page.locator('input[value="Remove"], button:has-text("Remove")');
@@ -163,7 +163,7 @@ async function placeShareBlock(world, theme, id, region) {
   // Submit by calling .click() inside the page context rather than via
   // Playwright actionability. The Block layout admin form is the same across
   // themes, but Drupal CMS's Gin theme adds a sticky top bar that intercepts
-  // pointer events on the bottom save button — a normal Playwright click
+  // pointer events on the bottom save button - a normal Playwright click
   // times out there. JS click skips actionability and submits the same form.
   await world.page.evaluate(() => {
     document.querySelector('#edit-actions-submit').click();
@@ -194,7 +194,7 @@ Given(/^the Webshare Share blocks are placed in the content regions$/, async fun
 
 /**
  * Place the Share block in the Header and Footer regions of the default
- * theme. This is the Drupal CMS variant — the Mercury theme (Drupal CMS
+ * theme. This is the Drupal CMS variant - the Mercury theme (Drupal CMS
  * 2.x default) exposes only content / header / footer regions, and the
  * `content` region is owned by Canvas-driven page content. The blocks get
  * the deterministic ids `webshare_header` and `webshare_footer`, exposed
@@ -217,8 +217,8 @@ Given(/^the Webshare Share blocks are placed in the header and footer regions$/,
  *
  * Must be invoked while logged in as a user with "administer webshare"
  * (e.g. the Webmaster). The form's submit handler invalidates the
- * webshare_platforms cache tag, so the rendered rail — including the
- * anonymous page cache — reflects the new set immediately.
+ * webshare_platforms cache tag, so the rendered rail - including the
+ * anonymous page cache - reflects the new set immediately.
  *
  * @param {object} world      - Cucumber world (provides page + parameters).
  * @param {string[]|"all"} on - Platform ids to enable, or "all".
@@ -229,7 +229,7 @@ async function setEnabledPlatforms(world, on) {
   const boxes = world.page.locator('input[type="checkbox"][name^="platforms_data"]');
   const total = await boxes.count();
   if (total === 0) {
-    throw new Error('No platform checkboxes found — are you logged in as an administrator?');
+    throw new Error('No platform checkboxes found - are you logged in as an administrator?');
   }
   for (let i = 0; i < total; i++) {
     const box = boxes.nth(i);
@@ -285,7 +285,7 @@ Given(/^I enable the Webshare platform "([^"]*)"$/, async function (platformId) 
  * Resolve a webship-js named selector from the world registry.
  *
  * The registry (`world.__selectorsCss`) is hydrated by webship-js from
- * `cucumber.shared.js`'s `selectors.files` list — see tests/selectors/*.json
+ * `cucumber.shared.js`'s `selectors.files` list - see tests/selectors/*.json
  * for the catalog. Throws when the name is unknown so a typo never silently
  * passes through to Playwright as a literal CSS string.
  */
@@ -295,8 +295,41 @@ function resolveName(world, name) {
   if (Object.prototype.hasOwnProperty.call(css, key)) {
     return css[key];
   }
-  const known = Object.keys(css).sort().join(', ');
-  throw new Error(`Unknown named selector "${key}". Registered names: ${known}`);
+  // Suggest the closest registered name (Levenshtein distance) so a typo
+  // surfaces a one-line hint instead of a wall of 281 selectors. The bulk
+  // dump is still available via `Then print css selectors` (webship-js).
+  const keys = Object.keys(css);
+  let best = null;
+  let bestDistance = Infinity;
+  for (const candidate of keys) {
+    const distance = (function lev(a, b) {
+      const m = a.length;
+      const n = b.length;
+      if (!m) return n;
+      if (!n) return m;
+      const row = new Array(n + 1);
+      for (let j = 0; j <= n; j += 1) row[j] = j;
+      for (let i = 1; i <= m; i += 1) {
+        let prev = i;
+        for (let j = 1; j <= n; j += 1) {
+          const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+          const cur = Math.min(row[j] + 1, prev + 1, row[j - 1] + cost);
+          row[j - 1] = prev;
+          prev = cur;
+        }
+        row[n] = prev;
+      }
+      return row[n];
+    }(key, candidate));
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = candidate;
+    }
+  }
+  const hint = best && bestDistance <= Math.max(4, Math.floor(key.length / 3))
+    ? ` Did you mean "${best}"?`
+    : '';
+  throw new Error(`Unknown named selector "${key}".${hint} Run "Then print css selectors" to see all ${keys.length} registered names.`);
 }
 
 /**
@@ -408,7 +441,7 @@ When(/^(?:I |we )?click(?: on)?(?: the)? "([^"]*)" element$/, async function (na
       await loc.click({ timeout: 4000 });
     }
     catch (e) {
-      // Sticky form-actions overlays (Gin) sometimes intercept the click —
+      // Sticky form-actions overlays (Gin) sometimes intercept the click -
       // fall back to a JS click which bypasses Playwright actionability.
       await this.page.evaluate((s) => {
         const el = document.querySelector(s);

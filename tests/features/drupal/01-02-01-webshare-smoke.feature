@@ -1,5 +1,5 @@
 @smoke @webshare
-Feature: Smoke — Webshare renders on the home page
+Feature: Smoke - Webshare renders on the home page
   As an anonymous visitor
   I want the test site to load with the Webshare block
   So that the Webshare module can be exercised

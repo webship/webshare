@@ -1,5 +1,5 @@
 @webshare @drupal-cms @admin
-Feature: Webshare module — back-end administration on Drupal CMS
+Feature: Webshare module - back-end administration on Drupal CMS
   As a Drupal CMS administrator
   I want to manage the Webshare platforms via the Gin admin UI
   So that I can enable networks and save the configuration

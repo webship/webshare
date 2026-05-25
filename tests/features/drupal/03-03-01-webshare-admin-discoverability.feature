@@ -1,5 +1,5 @@
 @webshare @admin
-Feature: Webshare module — admin discoverability
+Feature: Webshare module - admin discoverability
   As a site administrator
   I want the Webshare settings to be reachable from the configuration area
   So that I can find and manage the share rail

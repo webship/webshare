@@ -9,7 +9,7 @@ libraryOverrides:
 props:
   type: object
   properties:
-    # ── Settings exposed in Drupal Canvas (mirror of WebshareBlock::blockForm) ──
+    # = Settings exposed in Drupal Canvas (mirror of WebshareBlock::blockForm) =
     heading:
       type: string
       title: 'Title'
@@ -86,7 +86,7 @@ props:
       examples:
         - rail-end
 
-    # ── Implementation props (auto-populated at render time) ─────────────────
+    # = Implementation props (auto-populated at render time) =
     # Kept in the schema so callers (e.g. the legacy webshare block) can still
     # pass them. In Drupal Canvas they default to empty; the Twig falls back to
     # the `webshare_share_data()` Twig function (registered by this module),
@@ -108,7 +108,7 @@ props:
       description: 'Text forwarded to the Web Share API payload.'
       default: ''
     # NOTE: `webshare_links_id`, `native_label`, `native_icon`, and
-    # `native_icon_html` are intentionally NOT declared here — they are
+    # `native_icon_html` are intentionally NOT declared here - they are
     # implementation details that the Twig handles via `|default(...)` and
     # should never be exposed in the Canvas component editor.
     #

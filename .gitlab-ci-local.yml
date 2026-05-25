@@ -2,7 +2,7 @@
 #
 # The real .gitlab-ci.yml `include:`s the drupalci templates and runs the
 # webship-js browser jobs inside the drupalci PHP-Apache image with a MySQL
-# service — none of which gitlab-ci-local can reproduce ($_GITLAB_TEMPLATES_REPO
+# service - none of which gitlab-ci-local can reproduce ($_GITLAB_TEMPLATES_REPO
 # is not a public path, and the browser jobs need the composer-built site
 # artifact). This file therefore mirrors only the validate-stage jobs so the
 # lint/spell tooling can be exercised locally on the Node 20 image that

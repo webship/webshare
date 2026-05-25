@@ -1,5 +1,5 @@
 @webshare @drupal-cms @frontend
-Feature: Webshare module — front-end rendering on Drupal CMS
+Feature: Webshare module - front-end rendering on Drupal CMS
   As a Drupal CMS site visitor
   I want to see the social sharing buttons in the header and footer
   So that I can share the page on social platforms or through my device

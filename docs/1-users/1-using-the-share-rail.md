@@ -65,8 +65,8 @@ start of the list. Clicking it invokes
 }
 ```
 
-On supporting browsers — typically mobile Safari / Chrome on iOS, Android,
-and recent desktop builds — this opens the OS share sheet so the visitor
+On supporting browsers - typically mobile Safari / Chrome on iOS, Android,
+and recent desktop builds - this opens the OS share sheet so the visitor
 can share through any installed app (Mail, Messages, Slack, AirDrop, etc.).
 
 On browsers without Web Share API support the button is hidden via CSS.

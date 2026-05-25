@@ -8,7 +8,7 @@
  *    `navigator.share()`.
  *  - On desktop browsers (no `navigator.share`), the button copies the page
  *    URL to the clipboard as a graceful fallback so the control is still
- *    useful — and adds a `webshare--copied` flash so the user gets feedback.
+ *    useful - and adds a `webshare--copied` flash so the user gets feedback.
  *
  * Web Share API notes (per the W3C spec):
  *  - Requires transient activation: only call from inside the click handler.

@@ -9,7 +9,7 @@
 #   - Drupal Core Icons API mapping (`icon_map`, `native_share_icon`)
 #
 # The five core platforms (linkedin / facebook_share / x / whatsapp /
-# copy) are enabled by default for backwards compatibility — every other
+# copy) are enabled by default for backwards compatibility - every other
 # platform ships disabled so the rendered share rail stays focused. Site
 # builders enable additional networks via /admin/config/services/webshare.
 buttons:
@@ -95,7 +95,7 @@ buttons:
 # Drupal Core Icons API integration. Each entry maps a platform key (or
 # the native share button) to an icon pack + icon id. Rendered via
 # `#type: icon` when the referenced pack is registered. Empty by default
-# so the module stays icon-library-agnostic — themes / sites pick their
+# so the module stays icon-library-agnostic - themes / sites pick their
 # preferred pack (bootstrap_icons, phosphor, font-awesome, vartheme_social,
 # material_symbols, etc.) by overriding these keys.
 icon_map: {  }

@@ -6,7 +6,7 @@
  * 18px bold heading.
  *
  * ┌─────────────────────────────────────────────────────────────────────┐
- * │  Theme override — CSS custom property API                           │
+ * │  Theme override - CSS custom property API                           │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │  Every visual aspect is exposed as a `--webshare-*` custom          │
  * │  property defined on `.webshare`. Themes can re-skin the whole      │

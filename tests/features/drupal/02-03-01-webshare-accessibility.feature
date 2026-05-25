@@ -1,5 +1,5 @@
 @webshare @a11y @frontend
-Feature: Webshare module — accessibility of the share rail
+Feature: Webshare module - accessibility of the share rail
   As a visitor using assistive technology
   I want the share rail to be a labelled landmark with accessible controls
   So that I can find and operate the sharing buttons

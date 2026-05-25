@@ -41,8 +41,8 @@ tests/videos/{drupal,drupalcms}/
 ```
 tests/
 ├── features/
-│   ├── drupal/        # 11 .feature files — Standard / Olivero
-│   └── drupalcms/     # 5 .feature files — Drupal CMS / Mercury
+│   ├── drupal/        # 11 .feature files - Standard / Olivero
+│   └── drupalcms/     # 5 .feature files - Drupal CMS / Mercury
 ├── selectors/
 │   ├── webshare.json              # Shared component selectors
 │   ├── drupal-olivero.json        # Above/Below block selectors
@@ -50,7 +50,7 @@ tests/
 │   ├── cms-drupal-core-claro.json # Sibling-shared Claro admin
 │   └── cms-drupal-cms-gin.json    # Sibling-shared Gin admin
 ├── step-definitions/
-│   └── webshare.steps.js          # Custom steps — pure browser only
+│   └── webshare.steps.js          # Custom steps - pure browser only
 ├── reports/, screenshots/, videos/  # Per-flavour run output dirs
 └── README.md
 ```
@@ -58,7 +58,7 @@ tests/
 ## Custom Step Definitions
 
 `tests/step-definitions/webshare.steps.js` provides webshare-specific
-steps. All steps drive the browser through Playwright — no Drush,
+steps. All steps drive the browser through Playwright - no Drush,
 no shell, no PHP scripts. Site provisioning that can't be done via
 the UI (Drupal install, Canvas fixtures, page_region seeding) is
 handled by the CI `before_script`, not by Cucumber steps.
@@ -91,13 +91,13 @@ actionable errors rather than silent CSS-as-string mismatches.
 281 named selectors are registered across the 5 JSON files. The naming
 convention:
 
-- `share <part>` — component piece (no theme prefix). E.g.
+- `share <part>` - component piece (no theme prefix). E.g.
   `share rail`, `share item linkedin`, `share native button`.
-- `above|below share <part>` — Olivero/Standard block-scoped variant.
-- `header|footer share <part>` — Mercury/Canvas region-scoped variant.
-- `webshare admin <part>` — admin form selectors.
+- `above|below share <part>` - Olivero/Standard block-scoped variant.
+- `header|footer share <part>` - Mercury/Canvas region-scoped variant.
+- `webshare admin <part>` - admin form selectors.
 
-Every assertion in every `.feature` file uses these names — no raw CSS
+Every assertion in every `.feature` file uses these names - no raw CSS
 appears in scenario lines.
 
 ## CI
@@ -127,7 +127,7 @@ run locally through `npx gitlab-ci-local --file .gitlab-ci-local.yml`.
 3. Run the suite locally and confirm green.
 4. Open a merge request.
 
-For new step phrasings (rare — most things can be expressed with the
+For new step phrasings (rare - most things can be expressed with the
 existing vocabulary), add them to `webshare.steps.js`. Follow the
 "pure browser, no Drush/bash/PHP" rule: any site state your step
 needs that can't be set via the UI should be handled by the CI
