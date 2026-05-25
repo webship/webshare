@@ -253,9 +253,16 @@ webship-js-test-drupal-cms:
     # = Build a fresh Drupal CMS project (does not collide with drupalci) =
     - composer create-project drupal/cms $_CMS_BUILD_DIR --no-interaction --no-progress
     # = Add the local webshare module as a `path` repository + require it =
+    # drupal/cms ships `minimum-stability: stable`; the local checkout is the
+    # `2.0.x-dev` branch, so require it with explicit `@dev` stability and
+    # relax the project's own minimum-stability so the path-repo dev version
+    # is acceptable. `prefer-stable` stays true so only this one package
+    # picks up the dev release.
     - cd $_CMS_BUILD_DIR
+    - composer config minimum-stability dev
+    - composer config prefer-stable true
     - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true}}'
-    - composer require drupal/webshare:* --no-interaction --no-progress
+    - composer require 'drupal/webshare:2.0.x-dev@dev' --no-interaction --no-progress
     # = Web server =
     - mkdir -pv $_CMS_BUILD_DIR/web/sites/default/files
     - mkdir -pv $_CMS_BUILD_DIR/web/sites/simpletest
