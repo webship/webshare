@@ -5,6 +5,6 @@ services:
     arguments: ['@service_container']
   webshare.twig_extension:
     class: Drupal\webshare\TwigExtension\WebshareTwigExtension
-    arguments: ['@webshare.service']
+    arguments: ['@webshare.service', '@renderer']
     tags:
       - { name: twig.extension }

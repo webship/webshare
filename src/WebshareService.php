@@ -73,7 +73,7 @@ class WebshareService implements WebshareServiceInterface {
    *   The extension module list.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
-   * @param \Drupal\Core\Render\RendererInterface|null $renderer
+   * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\Component\Plugin\PluginManagerInterface|null $icon_pack_manager
    *   The Icon Pack plugin manager. NULL when neither Drupal Core 11.1+
@@ -85,14 +85,14 @@ class WebshareService implements WebshareServiceInterface {
       ConfigFactoryInterface $config_factory,
       ModuleExtensionList $module_extension_list,
       Connection $database,
-      ?RendererInterface $renderer = NULL,
+      RendererInterface $renderer,
       $icon_pack_manager = NULL,
       ?LoggerChannelFactoryInterface $logger_factory = NULL,
   ) {
     $this->configFactory = $config_factory;
     $this->moduleExtensionList = $module_extension_list;
     $this->database = $database;
-    $this->renderer = $renderer ?: \Drupal::service('renderer');
+    $this->renderer = $renderer;
     $this->iconPackManager = $icon_pack_manager;
     $this->loggerFactory = $logger_factory;
   }

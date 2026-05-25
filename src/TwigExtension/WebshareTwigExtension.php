@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\webshare\TwigExtension;
 
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\webshare\WebshareServiceInterface;
 use Twig\Extension\AbstractExtension;
@@ -24,6 +25,7 @@ final class WebshareTwigExtension extends AbstractExtension {
 
   public function __construct(
       protected readonly WebshareServiceInterface $webshareService,
+      protected readonly RendererInterface $renderer,
   ) {
   }
 
@@ -76,7 +78,7 @@ final class WebshareTwigExtension extends AbstractExtension {
     BubbleableMetadata::createFromRenderArray($build)->applyTo($marker);
     $marker['#markup'] = '';
     try {
-      \Drupal::service('renderer')->render($marker);
+      $this->renderer->render($marker);
     } catch (\Throwable $e) {
       // Outside of a render context (rare, e.g. unit tests) bubbling is a
       // no-op and we simply skip it.
