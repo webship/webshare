@@ -29,5 +29,4 @@ interface WebshareServiceInterface {
    *   Renderable build array consuming the `webshare:share` SDC component.
    */
   public function build($url, $id, array $options = []);
-
 }

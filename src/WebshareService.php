@@ -72,11 +72,11 @@ class WebshareService implements WebshareServiceInterface {
    *   nor the ui_icons contrib module is enabled.
    */
   public function __construct(
-    ConfigFactoryInterface $config_factory,
-    ModuleExtensionList $module_extension_list,
-    Connection $database,
-    ?RendererInterface $renderer = NULL,
-    $icon_pack_manager = NULL,
+      ConfigFactoryInterface $config_factory,
+      ModuleExtensionList $module_extension_list,
+      Connection $database,
+      ?RendererInterface $renderer = NULL,
+      $icon_pack_manager = NULL,
   ) {
     $this->configFactory = $config_factory;
     $this->moduleExtensionList = $module_extension_list;
@@ -93,11 +93,11 @@ class WebshareService implements WebshareServiceInterface {
    */
   public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('config.factory'),
-      $container->get('extension.list.module'),
-      $container->get('database'),
-      $container->get('renderer'),
-      $container->has('plugin.manager.icon_pack')
+        $container->get('config.factory'),
+        $container->get('extension.list.module'),
+        $container->get('database'),
+        $container->get('renderer'),
+        $container->has('plugin.manager.icon_pack')
         ? $container->get('plugin.manager.icon_pack')
         : NULL,
     );
@@ -201,8 +201,7 @@ class WebshareService implements WebshareServiceInterface {
         }
         if (!str_starts_with($image_src, 'http') && !str_starts_with($image_src, '/')) {
           $image_src = $base_url . '/' . $image_src;
-        }
-        elseif (str_starts_with($image_src, '/')) {
+        } elseif (str_starts_with($image_src, '/')) {
           $image_src = $base_url . $image_src;
         }
         $icon_src = $image_src;

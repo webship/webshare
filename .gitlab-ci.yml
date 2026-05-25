@@ -141,35 +141,111 @@ webship-js-test:
     - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT cache:rebuild
     - !reference [.fragments, node_playwright]
   script:
-    # cucumber.js loads only `tests/features/drupal/**`.
-    - ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip"
+    # cucumber.js loads only `tests/features/drupal/**`. Disable webship-js's
+    # auto HTML hook (it cannot await PDF generation from `process.on('exit')`)
+    # and run `generate-reports` explicitly after cucumber-js so both HTML and
+    # PDF land next to the JSON in `tests/reports/drupal/`.
+    - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip"
+    - node ./node_modules/webship-js/bin/generate-reports.js
+        --json tests/reports/drupal/cucumber_report.json
+        --out  tests/reports/drupal/cucumber_report.html
+        --format all
+        --pdf-out tests/reports/drupal/cucumber_report.pdf
   allow_failure: false
 
 # ─── webship-js BDD — Drupal CMS distribution ─────────────────────────────────
 #
 # Runs the `tests/features/drupalcms/` suite on a Drupal CMS distribution
 # (drupal/cms) installed with the `drupal_cms_installer` profile, not the
-# Standard profile. The Drupal CMS installer ignores `--account-name` and
-# `--account-pass`, so uid 1 is renamed post-install to `webmaster` with
-# the password the shared cucumber `users` registry expects.
+# Standard profile.
+#
+# This job does NOT extend `.drupal-node-base` — drupalci's prebuilt
+# `composer` artefact pins `cweagans/composer-patches` to ~1.0, which
+# conflicts with drupal/cms ≥2.1 (requires ^2). Instead the job runs
+# `composer create-project drupal/cms` from scratch into a sibling
+# directory, then adds the local webshare module path.
+#
+# The Drupal CMS installer ignores `--account-name` / `--account-pass`,
+# so uid 1 is renamed post-install to `webmaster` with the password the
+# shared cucumber `users` registry expects.
 webship-js-test-drupal-cms:
-  extends: .drupal-node-base
+  extends: .testing-job-base
+  needs: []
+  services:
+    - name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB_TYPE-$_TARGET_DB_VERSION:$_TARGET_DB_IMAGE_TAG
+      alias: database
+  variables:
+    DRUPAL_ADMIN_USERNAME: "webmaster"
+    DRUPAL_ADMIN_PASSWORD: "dD.123123ddd"
+    DRUPAL_TEST_BASE_URL: "http://localhost"
+    LAUNCH_URL: "http://localhost"
+    FORCE_COLOR: "1"
+    _CMS_BUILD_DIR: "/tmp/cms-build"
+  artifacts:
+    when: always
+    paths:
+      - tests/reports/
+      - tests/screenshots/
+      - tests/videos/
+    expire_in: 7 days
+    reports:
+      junit: tests/reports/junit.xml
   before_script:
-    - !reference [.fragments, web_db]
-    # Pull the Drupal CMS distribution into the build.
-    - composer require drupal/cms --no-interaction --no-progress
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install drupal_cms_installer
+    # ── Build a fresh Drupal CMS project (does not collide with drupalci) ──
+    - composer create-project drupal/cms $_CMS_BUILD_DIR --no-interaction --no-progress
+    # ── Add the local webshare module as a `path` repository + require it ──
+    - cd $_CMS_BUILD_DIR
+    - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true}}'
+    - composer require drupal/webshare:* --no-interaction --no-progress
+    # ── Web server ──────────────────────────────────────────────────────────
+    - mkdir -pv $_CMS_BUILD_DIR/web/sites/default/files
+    - mkdir -pv $_CMS_BUILD_DIR/web/sites/simpletest
+    - chmod -R 777 $_CMS_BUILD_DIR/web/sites/default/files
+    - chmod -R 777 $_CMS_BUILD_DIR/web/sites/simpletest
+    - rm -rf /var/www/html && ln -s $_CMS_BUILD_DIR/web /var/www/html
+    - chown -R www-data:www-data $_CMS_BUILD_DIR
+    - service apache2 start
+    - export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE
+    # ── Drupal CMS site install ─────────────────────────────────────────────
+    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web site:install drupal_cms_installer
         --db-url=$SIMPLETEST_DB --site-name="Webshare Drupal CMS Test" -y
-    # Drupal CMS's installer ignores --account-name/--account-pass and creates
-    # uid 1 as `admin` with no password — rename to match the shared registry.
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:eval '$u=\Drupal\user\Entity\User::load(1); $u->setUsername("webmaster"); $u->setEmail("webmaster@example.test"); $u->setPassword("dD.123123ddd"); $u->save();'
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT en webshare -y
-    # Add `webshare:share` to the Mercury header + footer Canvas page_region
-    # entities (Drupal CMS uses Canvas for its layout, not classic blocks).
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:eval '$c=\Drupal::entityTypeManager()->getStorage("component")->load("sdc.webshare.share"); if($c){ $v=$c->getActiveVersion(); foreach(["header"=>"aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa","footer"=>"bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb"] as $r=>$u){ $pr=\Drupal::entityTypeManager()->getStorage("page_region")->load("mercury.$r"); if(!$pr){continue;} $tree=$pr->get("component_tree"); $tree[$u]=["uuid"=>$u,"component_id"=>"sdc.webshare.share","component_version"=>$v,"inputs"=>["heading"=>$r==="footer"?"Share this page":"Share","display_title"=>$r==="footer","alignment"=>$r==="footer"?"start":"end","orientation"=>"horizontal","mobile_visibility"=>"all","native_share"=>true,"placement"=>"inline","share_title"=>"","share_text"=>""]]; $pr->set("component_tree",$tree)->save(); } }'
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT cache:rebuild
+    # ── Rename uid 1 to webmaster ──────────────────────────────────────────
+    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web php:eval '$u=\Drupal\user\Entity\User::load(1); $u->setUsername("webmaster"); $u->setEmail("webmaster@example.test"); $u->setPassword("dD.123123ddd"); $u->save();'
+    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web en webshare -y
+    # ── Seed the Mercury header + footer Canvas page_region entities ───────
+    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web php:eval '$c=\Drupal::entityTypeManager()->getStorage("component")->load("sdc.webshare.share"); if($c){ $v=$c->getActiveVersion(); foreach(["header"=>"aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa","footer"=>"bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb"] as $r=>$u){ $pr=\Drupal::entityTypeManager()->getStorage("page_region")->load("mercury.$r"); if(!$pr){continue;} $tree=$pr->get("component_tree"); $tree[$u]=["uuid"=>$u,"component_id"=>"sdc.webshare.share","component_version"=>$v,"inputs"=>["heading"=>$r==="footer"?"Share this page":"Share","display_title"=>$r==="footer","alignment"=>$r==="footer"?"start":"end","orientation"=>"horizontal","mobile_visibility"=>"all","native_share"=>true,"placement"=>"inline","share_title"=>"","share_text"=>""]]; $pr->set("component_tree",$tree)->save(); } }'
+    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web cache:rebuild
+    # ── Node.js 20 + Playwright Chromium (from CI_PROJECT_DIR — features live there) ──
+    - cd $CI_PROJECT_DIR
     - !reference [.fragments, node_playwright]
   script:
-    # cucumber.drupalcms.js loads only `tests/features/drupalcms/**`.
-    - ./node_modules/.bin/cucumber-js --config cucumber.drupalcms.js --tags "not @wip"
+    # cucumber.drupalcms.js loads only `tests/features/drupalcms/**`. Disable
+    # the auto HTML hook and run `generate-reports` explicitly so HTML + PDF
+    # both land next to the JSON in `tests/reports/drupalcms/`.
+    - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.drupalcms.js --tags "not @wip"
+    - node ./node_modules/webship-js/bin/generate-reports.js
+        --json tests/reports/drupalcms/cucumber_report.json
+        --out  tests/reports/drupalcms/cucumber_report.html
+        --format all
+        --pdf-out tests/reports/drupalcms/cucumber_report.pdf
   allow_failure: false
+
+# ─── GitLab Pages — MkDocs documentation site ─────────────────────────────────
+#
+# Builds the Material-for-MkDocs site under `docs/` and publishes it to
+# https://project.pages.drupalcode.org/webshare/. Only runs for the
+# default branch so feature branches don't replace the live docs.
+pages:
+  stage: deploy
+  image: python:3.12-slim
+  needs: []
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - pip install --quiet mkdocs-material pymdown-extensions
+  script:
+    - mkdocs build --strict --site-dir public
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days

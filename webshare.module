@@ -43,8 +43,7 @@ function webshare_theme($existing, $type, $theme, $path) {
         ];
       }
     }
-  }
-  catch (\Exception $e) {
+  } catch (\Exception $e) {
     // Bootstrap before the platforms table exists — fall through to defaults.
   }
 

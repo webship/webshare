@@ -23,8 +23,9 @@ use Twig\TwigFunction;
 final class WebshareTwigExtension extends AbstractExtension {
 
   public function __construct(
-    protected readonly WebshareServiceInterface $webshareService,
-  ) {}
+      protected readonly WebshareServiceInterface $webshareService,
+  ) {
+  }
 
   /**
    * {@inheritdoc}
@@ -52,8 +53,7 @@ final class WebshareTwigExtension extends AbstractExtension {
     if ($url === '') {
       try {
         $url = Url::fromRoute('<current>')->setAbsolute()->toString();
-      }
-      catch (\Throwable $e) {
+      } catch (\Throwable $e) {
         $url = '';
       }
     }
@@ -62,8 +62,7 @@ final class WebshareTwigExtension extends AbstractExtension {
 
     try {
       $build = $this->webshareService->build($url, $id, $options);
-    }
-    catch (\Throwable $e) {
+    } catch (\Throwable $e) {
       return ['url' => $url, 'platforms' => []];
     }
 
@@ -78,8 +77,7 @@ final class WebshareTwigExtension extends AbstractExtension {
     $marker['#markup'] = '';
     try {
       \Drupal::service('renderer')->render($marker);
-    }
-    catch (\Throwable $e) {
+    } catch (\Throwable $e) {
       // Outside of a render context (rare, e.g. unit tests) bubbling is a
       // no-op and we simply skip it.
     }
@@ -90,5 +88,4 @@ final class WebshareTwigExtension extends AbstractExtension {
       'platforms' => $props['platforms'] ?? [],
     ];
   }
-
 }

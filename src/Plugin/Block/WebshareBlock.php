@@ -189,9 +189,9 @@ class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface
       // pass them through as service options so the component receives them
       // as props.
       $heading = '';
-      if (!empty($config['display_title'])) {
-          $heading = (string) ($config['heading'] ?? 'Share');
-      }
+    if (!empty($config['display_title'])) {
+        $heading = (string) ($config['heading'] ?? 'Share');
+    }
 
       return $this->shareService->build($url->setAbsolute()->toString(), $id, [
           'heading' => $heading,
