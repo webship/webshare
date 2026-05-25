@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\webshare\TwigExtension;
 
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use Drupal\webshare\WebshareServiceInterface;
 use Twig\Extension\AbstractExtension;
@@ -64,6 +65,23 @@ final class WebshareTwigExtension extends AbstractExtension {
     }
     catch (\Throwable $e) {
       return ['url' => $url, 'platforms' => []];
+    }
+
+    // Bubble cache metadata from the render-array build into the active
+    // render context so the SDC / Canvas-rendered rail picks up the
+    // `webshare_platforms` cache tag — without this, enabling or disabling a
+    // platform never invalidates a Canvas-rendered share component. A
+    // dedicated render-only-metadata marker array lets the renderer collect
+    // the tags via its public API (no protected RenderContext access).
+    $marker = [];
+    BubbleableMetadata::createFromRenderArray($build)->applyTo($marker);
+    $marker['#markup'] = '';
+    try {
+      \Drupal::service('renderer')->render($marker);
+    }
+    catch (\Throwable $e) {
+      // Outside of a render context (rare, e.g. unit tests) bubbling is a
+      // no-op and we simply skip it.
     }
 
     $props = $build['#props'] ?? [];

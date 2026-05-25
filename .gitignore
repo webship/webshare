@@ -5,10 +5,31 @@ yarn-error.log
 ADMIN_GUIDE.md
 .eslintcache
 
-# Test + automation runtime artifacts.
-screenshots/
-videos/
-tests/reports/
+# Test runtime artefacts. The directories themselves are tracked so the
+# layout (per-flavour subfolders + READMEs) is reproducible after a clean
+# checkout; only the generated files inside them are ignored.
+tests/reports/**
+tests/screenshots/**
+tests/videos/**
+!tests/reports/
+!tests/reports/*/
+!tests/reports/**/README.md
+!tests/reports/**/.gitignore
+!tests/screenshots/
+!tests/screenshots/*/
+!tests/screenshots/**/README.md
+!tests/screenshots/**/.gitignore
+!tests/videos/
+!tests/videos/*/
+!tests/videos/**/README.md
+!tests/videos/**/.gitignore
+
+# gitlab-ci-local runtime cache + per-developer logs.
+.gitlab-ci-local/
+
+# MkDocs build output and cache.
+site/
+.cache/
 
 # Playwright + Claude session captures.
 .playwright-mcp/

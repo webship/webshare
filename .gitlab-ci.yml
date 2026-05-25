@@ -1,3 +1,19 @@
+################################################################################
+# GitLab CI for the Webshare module.
+#
+# Validation jobs (cspell / eslint / stylelint) plus three webship-js BDD
+# browser-test jobs:
+#   - webship-js-test                → Drupal Standard profile
+#   - webship-js-test-drupal-cms     → Drupal CMS distribution
+#   - webship-js-test-canvas         → Drupal Standard + Drupal Canvas
+#
+# The webship-js suite drives the site entirely through the browser. The
+# first feature (01-01-01-users-login) logs in as the Webmaster, places the
+# Share block on the front page and provisions the per-role testing users —
+# so the before_script only has to build the site, enable the module(s) and
+# install Node + Playwright.
+################################################################################
+
 include:
   - project: $_GITLAB_TEMPLATES_REPO
     ref: $_GITLAB_TEMPLATES_REF
@@ -6,18 +22,33 @@ include:
       - "/includes/include.drupalci.variables.yml"
       - "/includes/include.drupalci.workflows.yml"
 
+variables:
+  COMPOSER_FLAGS: "--no-strict-lock"
+  COMPOSER_MEMORY_LIMIT: "-1"
+  # No yarn.lock is committed; Yarn 4 defaults to immutable installs and would
+  # refuse to create one. Allow lockfile creation in CI for every job.
+  YARN_ENABLE_IMMUTABLE_INSTALLS: "false"
+
+# Override the default composer job to use development versions.
+composer:
+  variables:
+    DRUPAL_CORE: $CORE_SUPPORTED
+    IGNORE_PROJECT_DRUPAL_CORE_VERSION: 0
+
+# ─── Validate stage ───────────────────────────────────────────────────────────
 cspell:
   stage: validate
-  image: node:18
+  image: node:20
   before_script:
     - npm install -g cspell
   script:
     - cspell "**/*.{php,module,inc,install,test,profile,theme,js,css,md,yml,txt}" --no-progress || true
   allow_failure: true
 
+# Node 20+ required: webship-js >=2.0 declares engines.node ">=20".
 eslint:
   stage: validate
-  image: node:18
+  image: node:20
   before_script:
     - corepack enable
     - yarn install
@@ -30,7 +61,7 @@ eslint:
 
 stylelint:
   stage: validate
-  image: node:18
+  image: node:20
   before_script:
     - corepack enable
     - yarn install
@@ -40,18 +71,30 @@ stylelint:
     - echo '[]' > gl-codequality.json
   allow_failure: true
 
-# ─── Shared Drupal + Node.js setup for browser tests ──────────────────────────
-#
-# How it works:
-#   1. The drupalci `composer` job builds a full Drupal site and passes its
-#      artifact to this job via `needs: [composer]`.
-#   2. This job runs inside the drupalci PHP-Apache image (inherited from
-#      `.testing-job-base`) which already has PHP, Apache, Drush, and MySQL.
-#   3. before_script installs Drupal + the module, places the Webshare block,
-#      then installs Node.js + yarn deps + Playwright Chromium. Test jobs only
-#      override `script:`.
-#   4. `DRUPAL_ADMIN_PASSWORD=admin` matches the password set by `drush si`.
-# ──────────────────────────────────────────────────────────────────────────────
+# ─── Reusable before_script fragments (via !reference) ────────────────────────
+.fragments:
+  web_db: &web_db
+    - mkdir -pv $CI_PROJECT_DIR/$_WEB_ROOT/sites/default/files
+    - mkdir -pv $CI_PROJECT_DIR/$_WEB_ROOT/sites/simpletest
+    - chmod -R 777 $CI_PROJECT_DIR/$_WEB_ROOT/sites/default/files
+    - chmod -R 777 $CI_PROJECT_DIR/$_WEB_ROOT/sites/simpletest
+    - rm -rf /var/www/html && ln -s $CI_PROJECT_DIR/$_WEB_ROOT /var/www/html
+    - chown -R www-data:www-data $CI_PROJECT_DIR
+    - service apache2 start
+    - export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE
+  node_playwright: &node_playwright
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get install -y nodejs
+    - node --version && npm --version
+    - 'test -f .yarnrc.yml || echo "nodeLinker: node-modules" > .yarnrc.yml'
+    # Back up cucumber.js — webship-js's postinstall can clobber it under yarn 4.
+    - cp cucumber.js .cucumber.js.bak
+    - corepack enable
+    - yarn install
+    - cp .cucumber.js.bak cucumber.js && rm .cucumber.js.bak
+    - ./node_modules/.bin/playwright install --with-deps chromium
+
+# ─── Shared base for browser-test jobs ────────────────────────────────────────
 .drupal-node-base:
   extends: .testing-job-base
   needs: [composer]
@@ -61,62 +104,72 @@ stylelint:
     - name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB_TYPE-$_TARGET_DB_VERSION:$_TARGET_DB_IMAGE_TAG
       alias: database
   variables:
-    DRUPAL_ADMIN_USERNAME: "admin"
-    DRUPAL_ADMIN_PASSWORD: "admin"
+    DRUPAL_ADMIN_USERNAME: "webmaster"
+    DRUPAL_ADMIN_PASSWORD: "dD.123123ddd"
     DRUPAL_TEST_BASE_URL: "http://localhost"
     LAUNCH_URL: "http://localhost"
     FORCE_COLOR: "1"
-  before_script:
-    # ── Web server ──────────────────────────────────────────────────────────
-    - mkdir -pv $CI_PROJECT_DIR/$_WEB_ROOT/sites/default/files
-    - mkdir -pv $CI_PROJECT_DIR/$_WEB_ROOT/sites/simpletest
-    - chmod -R 777 $CI_PROJECT_DIR/$_WEB_ROOT/sites/default/files
-    - chmod -R 777 $CI_PROJECT_DIR/$_WEB_ROOT/sites/simpletest
-    - rm -rf /var/www/html && ln -s $CI_PROJECT_DIR/$_WEB_ROOT /var/www/html
-    - chown -R www-data:www-data $CI_PROJECT_DIR
-    - service apache2 start
-    # ── Database ────────────────────────────────────────────────────────────
-    - export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE
-    # ── Drupal site install ─────────────────────────────────────────────────
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install standard
-        --db-url=$SIMPLETEST_DB
-        --account-name=admin
-        --account-pass=admin
-        --site-name="Webshare Test"
-        -y
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT en webshare -y
-    # ── Place the Webshare block so the buttons render on every page ─────────
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:script
-        $CI_PROJECT_DIR/tests/fixtures/place-webshare-block.php
-    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT cache:rebuild
-    # ── Node.js 20 ──────────────────────────────────────────────────────────
-    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    - apt-get install -y nodejs
-    - node --version && npm --version
-    # ── Yarn deps + Playwright Chromium ─────────────────────────────────────
-    # Force node_modules layout so node_modules/.bin/* is populated.
-    - 'test -f .yarnrc.yml || echo "nodeLinker: node-modules" > .yarnrc.yml'
-    # Back up cucumber.js — webship-js's postinstall can clobber it under yarn 4
-    # because INIT_CWD may differ from our project root inside the container.
-    - cp cucumber.js .cucumber.js.bak
-    - corepack enable
-    - yarn install
-    # Restore cucumber.js if postinstall overwrote it with the init-webship template.
-    - cp .cucumber.js.bak cucumber.js && rm .cucumber.js.bak
-    - ./node_modules/.bin/playwright install --with-deps chromium
-
-# ─── webship-js BDD functional tests ──────────────────────────────────────────
-webship-js-test:
-  extends: .drupal-node-base
-  script:
-    - ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip"
   artifacts:
     when: always
     paths:
       - tests/reports/
-      - screenshots/
-      - videos/
+      - tests/screenshots/
+      - tests/videos/
     expire_in: 7 days
     reports:
       junit: tests/reports/junit.xml
+
+# ─── webship-js BDD — Drupal Standard profile ─────────────────────────────────
+#
+# Runs the `tests/features/drupal/` suite on the Drupal Standard profile
+# with Drupal Canvas enabled (Canvas ships in the module's require-dev so
+# every job in this pipeline has it available). Includes the Canvas page +
+# content_template + blog node seeding for the @canvas scenarios.
+webship-js-test:
+  extends: .drupal-node-base
+  before_script:
+    - !reference [.fragments, web_db]
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install standard
+        --db-url=$SIMPLETEST_DB --account-name=webmaster --account-pass=dD.123123ddd
+        --site-name="Webshare Test" -y
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT en webshare canvas -y
+    # Seed Canvas content entities (Canvas page + node.article.full content
+    # template + sample blog node) for the @canvas scenarios. The SDC
+    # component version is resolved at runtime so the seed survives Canvas
+    # schema bumps.
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:eval '$c=\Drupal::entityTypeManager()->getStorage("component")->load("sdc.webshare.share"); if($c){ $v=$c->getActiveVersion(); foreach(\Drupal::entityTypeManager()->getStorage("canvas_page")->loadByProperties(["title"=>"Webshare Canvas Test"]) as $e){$e->delete();} \Drupal\canvas\Entity\Page::create(["title"=>"Webshare Canvas Test","status"=>1,"path"=>["alias"=>"/webshare-canvas-test"],"components"=>["uuid"=>"11111111-1111-4111-8111-111111111111","component_id"=>"sdc.webshare.share","component_version"=>$v,"inputs"=>["heading"=>"Share this page","display_title"=>true,"alignment"=>"start","orientation"=>"horizontal","mobile_visibility"=>"all","native_share"=>true,"placement"=>"inline"]]])->save(); if($t=\Drupal::entityTypeManager()->getStorage("content_template")->load("node.article.full")){$t->delete();} \Drupal\canvas\Entity\ContentTemplate::create(["status"=>true,"content_entity_type_id"=>"node","content_entity_type_bundle"=>"article","content_entity_type_view_mode"=>"full","component_tree"=>[["uuid"=>"22222222-2222-4222-8222-222222222222","component_id"=>"sdc.webshare.share","component_version"=>$v,"inputs"=>["heading"=>"Share this article","display_title"=>true,"alignment"=>"end","orientation"=>"vertical","mobile_visibility"=>"all","native_share"=>true,"placement"=>"rail-end"]]]])->save(); foreach(\Drupal::entityTypeManager()->getStorage("node")->loadByProperties(["title"=>"Community behind Webshare"]) as $e){$e->delete();} \Drupal\node\Entity\Node::create(["type"=>"article","title"=>"Community behind Webshare","status"=>1,"path"=>["alias"=>"/blog/community-behind-webshare"],"body"=>["value"=>"<p>Hello blog body.</p>","format"=>"basic_html"]])->save(); }'
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT cache:rebuild
+    - !reference [.fragments, node_playwright]
+  script:
+    # cucumber.js loads only `tests/features/drupal/**`.
+    - ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip"
+  allow_failure: false
+
+# ─── webship-js BDD — Drupal CMS distribution ─────────────────────────────────
+#
+# Runs the `tests/features/drupalcms/` suite on a Drupal CMS distribution
+# (drupal/cms) installed with the `drupal_cms_installer` profile, not the
+# Standard profile. The Drupal CMS installer ignores `--account-name` and
+# `--account-pass`, so uid 1 is renamed post-install to `webmaster` with
+# the password the shared cucumber `users` registry expects.
+webship-js-test-drupal-cms:
+  extends: .drupal-node-base
+  before_script:
+    - !reference [.fragments, web_db]
+    # Pull the Drupal CMS distribution into the build.
+    - composer require drupal/cms --no-interaction --no-progress
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install drupal_cms_installer
+        --db-url=$SIMPLETEST_DB --site-name="Webshare Drupal CMS Test" -y
+    # Drupal CMS's installer ignores --account-name/--account-pass and creates
+    # uid 1 as `admin` with no password — rename to match the shared registry.
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:eval '$u=\Drupal\user\Entity\User::load(1); $u->setUsername("webmaster"); $u->setEmail("webmaster@example.test"); $u->setPassword("dD.123123ddd"); $u->save();'
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT en webshare -y
+    # Add `webshare:share` to the Mercury header + footer Canvas page_region
+    # entities (Drupal CMS uses Canvas for its layout, not classic blocks).
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT php:eval '$c=\Drupal::entityTypeManager()->getStorage("component")->load("sdc.webshare.share"); if($c){ $v=$c->getActiveVersion(); foreach(["header"=>"aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa","footer"=>"bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb"] as $r=>$u){ $pr=\Drupal::entityTypeManager()->getStorage("page_region")->load("mercury.$r"); if(!$pr){continue;} $tree=$pr->get("component_tree"); $tree[$u]=["uuid"=>$u,"component_id"=>"sdc.webshare.share","component_version"=>$v,"inputs"=>["heading"=>$r==="footer"?"Share this page":"Share","display_title"=>$r==="footer","alignment"=>$r==="footer"?"start":"end","orientation"=>"horizontal","mobile_visibility"=>"all","native_share"=>true,"placement"=>"inline","share_title"=>"","share_text"=>""]]; $pr->set("component_tree",$tree)->save(); } }'
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT cache:rebuild
+    - !reference [.fragments, node_playwright]
+  script:
+    # cucumber.drupalcms.js loads only `tests/features/drupalcms/**`.
+    - ./node_modules/.bin/cucumber-js --config cucumber.drupalcms.js --tags "not @wip"
   allow_failure: false

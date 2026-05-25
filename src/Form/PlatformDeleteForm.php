@@ -120,6 +120,10 @@ class PlatformDeleteForm extends ConfirmFormBase {
         ['%name' => $this->platform->name]
     ));
 
+    // Refresh every cached rendering of the share rail (anonymous page cache
+    // included) now that a platform has been removed.
+    \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
+
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

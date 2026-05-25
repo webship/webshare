@@ -223,8 +223,8 @@
 }
 
 .webshare__native-button.webshare--copied {
-  background: var(--webshare-copied-bg);
   color: var(--webshare-copied-color);
+  background: var(--webshare-copied-bg);
 }
 
 /* Rail-end placement: float the buttons as a sticky column at the end side
@@ -235,8 +235,8 @@
     position: sticky;
     top: var(--webshare-rail-top);
     float: inline-end;
-    margin-inline-start: var(--webshare-rail-gap);
     margin-block-end: 1rem;
+    margin-inline-start: var(--webshare-rail-gap);
   }
 }
 

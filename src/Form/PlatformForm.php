@@ -318,6 +318,10 @@ class PlatformForm extends FormBase {
 
       $this->messenger()->addMessage($this->t('Platform %name has been added.', ['%name' => $values['name']]));
     }
+
+    // Refresh every cached rendering of the share rail (anonymous page cache
+    // included) now that the platform set has changed.
+    \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
   }
 
   /**

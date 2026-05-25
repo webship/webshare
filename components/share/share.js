@@ -80,8 +80,7 @@
         (button) => {
           button.addEventListener('click', async (event) => {
             event.preventDefault();
-            const url =
-              button.dataset.webshareCopy || window.location.href;
+            const url = button.dataset.webshareCopy || window.location.href;
             const copied = await copyToClipboard(url);
             if (copied) {
               flashCopied(button);

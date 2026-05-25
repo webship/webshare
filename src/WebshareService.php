@@ -2,6 +2,7 @@
 
 namespace Drupal\webshare;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -246,6 +247,17 @@ class WebshareService implements WebshareServiceInterface {
       ],
       // The single-directory component (webshare:share) auto-attaches its
       // own scoped CSS and JS, so no #attached library is required here.
+      //
+      // The rendered rail depends on the enabled platform set (the
+      // `webshare_platforms` table) and on the module settings (icon map,
+      // native share icon). Tag the output so enabling / disabling a
+      // platform or editing the settings invalidates the cached markup —
+      // including the anonymous page cache, which the tags bubble up to.
+      // The share URL is per-request, so vary by the `url` context.
+      '#cache' => [
+        'tags' => Cache::mergeTags($config->getCacheTags(), ['webshare_platforms']),
+        'contexts' => ['url'],
+      ],
     ];
 
     // Heading is now exclusively a caller-provided prop. The block builds

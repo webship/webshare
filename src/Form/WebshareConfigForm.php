@@ -80,7 +80,7 @@ class WebshareConfigForm extends ConfigFormBase
    */
   public function getFormId()
   {
-      return 'webshare.config_form';
+      return 'webshare_config_form';
   }
 
   /**
@@ -254,7 +254,10 @@ class WebshareConfigForm extends ConfigFormBase
       }
     }
 
-      $this->renderCache->deleteAll();
+      // Invalidate the shared platform cache tag so every cached rendering of
+      // the share rail — including the anonymous page cache, which the tag
+      // bubbles up to — picks up the new enabled/weight values.
+      \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
       parent::submitForm($form, $form_state);
   }
 }

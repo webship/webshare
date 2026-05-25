@@ -1,0 +1,68 @@
+site_name: "Webshare"
+repo_url: https://www.drupal.org/project/webshare
+repo_name: drupal/webshare
+edit_uri: /-/edit/2.0.x/docs/
+
+theme:
+  name: material
+  language: en
+  logo: logo.png
+  # favicon: favicon.ico
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: indigo
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: indigo
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: indigo
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    # - navigation.tabs
+    # - navigation.tabs.sticky
+    - navigation.sections
+    # - navigation.expand
+
+nav:
+  - Introduction: "index.md"
+  - User Documentation:
+      - Installation and Setup: "1-users/0-installation.md"
+      - Using the Share Rail: "1-users/1-using-the-share-rail.md"
+      - Content Editor Guide: "1-users/2-content-editor-guide.md"
+  - Administrator Documentation:
+      - Configuration: "2-admins/0-configuration.md"
+      - Managing Platforms: "2-admins/1-platforms.md"
+      - Block Placement: "2-admins/2-block-placement.md"
+      - Drupal Canvas Integration: "2-admins/3-canvas-integration.md"
+      - Permissions: "2-admins/4-permissions.md"
+      - Drupal Core Icons API: "2-admins/5-icons-api.md"
+  - Developer Documentation:
+      - Architecture Overview: "3-developers/0-architecture.md"
+      - API Reference: "3-developers/1-api-reference.md"
+      - Database Schema: "3-developers/2-database-schema.md"
+      - The Share SDC Component: "3-developers/3-sdc-component.md"
+      - Drupal Canvas Integration: "3-developers/4-canvas-integration.md"
+      - Testing: "3-developers/5-testing.md"
+      - Extending Webshare: "3-developers/6-extending.md"
+  - Frequently Asked Questions: "faq.md"
+
+plugins:
+  - search
+  - privacy:
+      enabled: !ENV [CI, false]
+
+markdown_extensions:
+  # - markdown.extensions.admonition
+  - pymdownx.extra

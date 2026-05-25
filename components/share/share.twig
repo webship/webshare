@@ -70,8 +70,8 @@
   .addClass(classes)
   .setAttribute('aria-label', region_label)
   .setAttribute('data-webshare-url', url)
-  .setAttribute('data-webshare-title', share_title)
-  .setAttribute('data-webshare-text', share_text)
+  .setAttribute('data-webshare-title', share_title|default(''))
+  .setAttribute('data-webshare-text', share_text|default(''))
 }}>
   {% if _show_heading %}
     <h3 id="{{ heading_id }}" class="webshare__heading">{{ heading }}</h3>

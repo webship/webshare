@@ -16,5 +16,8 @@
     },
     "require": {
         "drupal/core": "^10 || ^11"
+    },
+    "require-dev": {
+        "drupal/canvas": "^1.4"
     }
 }

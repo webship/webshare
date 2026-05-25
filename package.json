@@ -11,7 +11,7 @@
     "theme:build": "yarn theme:build:admin",
     "phpcs": "phpcs --standard=./.phpcs.xml .",
     "phpcbf": "phpcbf --standard=./.phpcs.xml .",
-    "lint:js": "eslint --cache --cache-location .eslintcache --ext .js js/",
+    "lint:js": "eslint --cache --cache-location .eslintcache --ext .js components/",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:yaml": "eslint --ext .yml .",
     "spellcheck": "cspell lint .",
