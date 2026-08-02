@@ -11,6 +11,7 @@
  *  - share_title: Title passed to navigator.share().
  *  - share_text: Description text passed to navigator.share().
  *  - heading: Optional visible heading.
+ *  - heading_level: Semantic heading level (2-6, default 2) for the title, so it fits the surrounding document outline; visual size stays fixed via the webshare__heading class.
  *  - webshare_links_id: Unique id for the links list.
  *  - orientation: 'horizontal' or 'vertical'.
  *  - mobile_visibility: 'all', 'hide_mobile' or 'mobile_only'.
@@ -77,7 +78,7 @@
   .setAttribute('data-webshare-text', share_text|default(''))
 }}>
   {% if _show_heading %}
-    <h3 id="{{ heading_id }}" class="webshare__heading">{{ heading }}</h3>
+    <h{{ heading_level|default(2) }} id="{{ heading_id }}" class="webshare__heading">{{ heading }}</h{{ heading_level|default(2) }}>
   {% endif %}
   <ul id="{{ webshare_links_id }}" class="webshare__list"{% if _show_heading %} aria-labelledby="{{ heading_id }}"{% endif %}>
     {% if native_share %}
