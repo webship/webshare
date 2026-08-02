@@ -4370,10 +4370,10 @@ validate-npm-package-license@^3.0.4:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-webship-js@~2.0.0:
-  version "2.0.4"
-  resolved "https://registry.npmjs.org/webship-js/-/webship-js-2.0.4.tgz"
-  integrity sha512-nX1oWgkCCOzYrGHnegylcMYHL1Lb9cq5A4DkIhJfAywFjPD18J+jtqDlTX8/OtzTS1JuZjt7jaDr3r7J8zqgHw==
+webship-js@~2.0.5:
+  version "2.0.5"
+  resolved "https://registry.npmjs.org/webship-js/-/webship-js-2.0.5.tgz"
+  integrity sha512-Sx/nYs8nzdblsWAL/yMbKgQ2sJII1klC5KWfS7JzquqrWTjpEqo7sTgxKo21GEq+k5uAT9Q0e6VLa4ht73MA3Q==
   dependencies:
     "@axe-core/playwright" "^4.11.3"
     "@cucumber/cucumber" "*"

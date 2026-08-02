@@ -64,6 +64,6 @@
     "social-media"
   ],
   "dependencies": {
-    "webship-js": "~2.0.0"
+    "webship-js": "~2.0.5"
   }
 }
