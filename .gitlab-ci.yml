@@ -261,7 +261,15 @@ webship-js-test-drupal-cms:
     - cd $_CMS_BUILD_DIR
     - composer config minimum-stability dev
     - composer config prefer-stable true
-    - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true}}'
+    # `options.versions` pins the path package's resolved version explicitly.
+    # Without it, Composer guesses the version from the git working copy's
+    # branch name - but an MR pipeline checks out a detached merge commit, so
+    # there is no branch name and Composer falls back to `dev-<sha>`. That
+    # package name does not satisfy the `2.0.x-dev@dev` constraint below, and
+    # because path repos are canonical, the composer repo's real `dev-2.0.x`
+    # is discarded too - failing every MR pipeline regardless of the diff.
+    # https://getcomposer.org/doc/05-repositories.md#path
+    - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true,"versions":{"drupal/webshare":"2.0.x-dev"}}}'
     - composer require 'drupal/webshare:2.0.x-dev@dev' --no-interaction --no-progress
     # = Web server =
     - mkdir -pv $_CMS_BUILD_DIR/web/sites/default/files
