@@ -132,6 +132,13 @@ webship-js-test:
     - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install standard
         --db-url=$SIMPLETEST_DB --account-name=webmaster --account-pass=dD.123123ddd
         --site-name="Webshare Test" -y
+    # Core's Standard profile no longer ships the Article content type (it moved
+    # to the optional `article_content_type` recipe) - apply it so the
+    # "node.article.full" content template below has a real bundle to attach
+    # to. Without this, Canvas\Entity\ContentTemplate::label() throws
+    # "The 'article' bundle of the node entity type has no label." while
+    # rendering the seeded blog node, which is a 500, not a webshare bug.
+    - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT recipe $CI_PROJECT_DIR/$_WEB_ROOT/core/recipes/article_content_type
     - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT en webshare canvas -y
     # Seed Canvas content entities for the @canvas scenarios:
     #  - a Canvas page placing the webshare:share component,
