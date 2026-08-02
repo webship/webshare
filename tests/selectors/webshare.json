@@ -43,7 +43,7 @@
     "webshare admin edit linkedin link": "a.use-ajax[href*='/platform/linkedin/edit']",
     "webshare admin delete linkedin link": "a.use-ajax[href*='/platform/linkedin/delete']",
     "webshare admin modal links": "a.use-ajax[data-dialog-type='modal']",
-    "webshare admin services link": "a[href$='/admin/config/services/webshare']",
+    "webshare admin services link": "a.admin-item__link[href$='/admin/config/services/webshare']",
     "modal dialog": ".ui-dialog",
     "modal title": ".ui-dialog-title",
     "modal name field": ".ui-dialog input[name='name']",
