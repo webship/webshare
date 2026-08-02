@@ -1,0 +1,81 @@
+# PHPStan configuration for the Webshare module.
+#
+# This module's composer.json requires drupal/canvas (require-dev), whose
+# optional canvas_headless submodule extends a class from the uninstalled
+# custom_elements module. mglaman/phpstan-drupal's bootstrap autoloader walks
+# every extension physically present in a full site build and crashes on that
+# submodule before any analysis starts:
+#
+#   Error thrown in .../canvas_headless/src/RenderConverter/
+#   JsComponentCanvasRenderConverter.php ... while loading bootstrap file
+#   .../mglaman/phpstan-drupal/drupal-autoloader.php:
+#   Class "Drupal\custom_elements\RenderConverter\CanvasRenderConverter" not found
+#
+# That happens while the bootstrap file itself is loading, before `paths` /
+# `excludePaths` below are ever consulted - no scoping in this file can prevent
+# it. The only real switch, `extra.phpstan/extension-installer.ignore`, has to
+# live in the ROOT composer.json of whichever vendor/ tree phpstan runs against
+# - for the templated `phpstan` job that is the full site build assembled fresh
+# every pipeline run, not a file in this repo. So the templated `phpstan` job is
+# disabled in .gitlab-ci.yml and replaced with a self-contained "PHPStan" job
+# that installs its own small, isolated toolchain (phpstan/phpstan +
+# drupal/core, no phpstan-drupal, no extension-installer) - it never touches
+# Canvas or any other contrib module, so the crash cannot recur.
+#
+# The module owns the PHP under `src/` plus its procedural `.module`/`.install`
+# files, listed under `paths` below. `excludePaths` covers the case where the
+# CLI path argument (`.`) takes precedence over `paths`.
+parameters:
+  level: 1
+
+  paths:
+    - src
+    - webshare.module
+    - webshare.install
+
+  # `.module` and `.install` are PHP; PHPStan only reads `.php` unless told so.
+  fileExtensions:
+    - php
+    - module
+    - install
+
+  excludePaths:
+    analyseAndScan:
+      - web/*
+      - vendor/*
+      - node_modules/*
+      - tests/*
+    # The throwaway toolchain must stay SCANNABLE - `scanDirectories` below
+    # points into it for core's symbols - so exclude it from analysis only.
+    # Listing it under analyseAndScan would un-scan those directories and every
+    # core class would go back to "unknown".
+    analyse:
+      - .phpstan-tools/*
+
+  # Drupal's procedural hook layer legitimately uses global functions and
+  # untyped hook signatures; do not report the absence of type hints in them.
+  treatPhpDocTypesAsCertain: false
+
+  # Core MODULE namespaces (Drupal\views, Drupal\path_alias, ...) are registered
+  # at runtime by Drupal's own class loader, not by Composer's autoloader, so
+  # without phpstan-drupal they are invisible and every core-module base class or
+  # type hint is reported as "unknown class". Scanning core's module and lib
+  # directories teaches PHPStan those symbols without pulling in phpstan-drupal
+  # (whose bootstrap autoloader is what crashes on contrib - see the header).
+  # Scoped to the core modules this module's classes actually touch (views for
+  # the Views field plugin, path_alias for the block's alias manager, file for
+  # the platform icon upload) - scanning all of core/modules exhausts PHPStan's
+  # memory for no benefit.
+  scanDirectories:
+    - .phpstan-tools/vendor/drupal/core/lib
+    - .phpstan-tools/vendor/drupal/core/modules/views
+    - .phpstan-tools/vendor/drupal/core/modules/path_alias
+    - .phpstan-tools/vendor/drupal/core/modules/file
+
+  ignoreErrors:
+    # `new static()` in a create() factory is Drupal's documented pattern for
+    # ContainerFactoryPluginInterface / FormBase / ContainerInjectionInterface.
+    # PHPStan flags it because a subclass could add constructor arguments; in
+    # Drupal that is precisely how subclasses are expected to work, and the
+    # container calls create(), never the constructor directly.
+    - identifier: new.static

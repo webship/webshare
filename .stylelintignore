@@ -1,0 +1,13 @@
+node_modules/
+.yarn/
+vendor/
+# The CI pipeline assembles a full Drupal site under web/. Linting it would load
+# Drupal core's own stylelint config, which extends stylelint-prettier - a
+# package this module does not install - and the run dies with a
+# ConfigurationError instead of reporting this module's findings. Only lint what
+# this module owns.
+web/
+# Throwaway toolchain installed at runtime by the self-contained PHPStan job.
+.phpstan-tools/
+*.min.css
+*.map

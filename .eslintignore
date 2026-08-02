@@ -1,6 +1,13 @@
 node_modules/
 .yarn/
 vendor/
+# The CI pipeline assembles a full Drupal site under web/. Linting it would
+# load Drupal core's own eslint config, which extends plugins this module does
+# not install (eslint-plugin-jsdoc), and the run dies with a config error
+# instead of reporting this module's findings. Only lint what this module owns.
+web/
+# Throwaway toolchain installed at runtime by the self-contained PHPStan job.
+.phpstan-tools/
 # Ignore deliberately malformed YAML files.
 drupalci.yml
 # Ignore PostCSS config file (uses CommonJS require)

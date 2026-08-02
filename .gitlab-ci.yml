@@ -42,8 +42,8 @@ cspell:
   before_script:
     - npm install -g cspell
   script:
-    - cspell "**/*.{php,module,inc,install,test,profile,theme,js,css,md,yml,txt}" --no-progress || true
-  allow_failure: true
+    - cspell "**/*.{php,module,inc,install,test,profile,theme,js,css,md,yml,txt}" --no-progress
+  allow_failure: false
 
 # Node 20+ required: webship-js >=2.0 declares engines.node ">=20".
 eslint:
@@ -53,11 +53,11 @@ eslint:
     - corepack enable
     - yarn install
   script:
-    - yarn lint:js || true
-    - yarn lint:yaml || true
+    - yarn lint:js
+    - yarn lint:yaml
   after_script:
     - touch junit.xml _eslint.patch
-  allow_failure: true
+  allow_failure: false
 
 stylelint:
   stage: validate
@@ -66,10 +66,78 @@ stylelint:
     - corepack enable
     - yarn install
   script:
-    - yarn lint:css || true
+    - yarn lint:css
   after_script:
     - echo '[]' > gl-codequality.json
-  allow_failure: true
+  allow_failure: false
+
+# Every check gates the merge - no job in this pipeline is allowed to fail.
+phpcs:
+  allow_failure: false
+
+# The templated `phpstan` job cannot pass on this module, and no phpstan.neon
+# scoping can fix it - see the "🔬 PHPStan" job below for the confirmed root
+# cause and its self-contained replacement. This is a `rules:` override, not a
+# SKIP_* escape hatch: the check still gates the merge, just as the job below.
+phpstan:
+  rules:
+    - when: never
+
+# = PHPStan, self-contained =
+#
+# This module requires drupal/canvas (require-dev), whose optional
+# canvas_headless submodule extends a class from the uninstalled
+# custom_elements module. mglaman/phpstan-drupal's bootstrap autoloader walks
+# every extension present in a full site build and crashes on that submodule
+# before any analysis starts:
+#
+#   Class "Drupal\custom_elements\RenderConverter\CanvasRenderConverter" not found
+#
+# It fails while the bootstrap file itself loads, before phpstan.neon's
+# `paths`/`excludePaths` are ever consulted, so no scoping in this repo can
+# prevent it. The only real switch,
+# `extra.phpstan/extension-installer.ignore`, must live in the ROOT
+# composer.json of that vendor/ tree - the site build the templated pipeline
+# assembles fresh every run, not a file in this repo.
+#
+# So: the templated `phpstan` job is disabled above, and this job installs its
+# own small, isolated toolchain (phpstan/phpstan + drupal/core, no
+# phpstan-drupal, no extension-installer) under .phpstan-tools/ instead. It
+# never touches Canvas or any other contrib module, so the crash cannot recur,
+# and it still gates the merge like every other job here.
+"🔬 PHPStan":
+  stage: validate
+  image: php:8.4-cli
+  needs: []
+  before_script:
+    - apt-get update -y > /dev/null && apt-get install -y -qq git unzip zip > /dev/null
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - mkdir -p .phpstan-tools
+    - |
+      cat > .phpstan-tools/composer.json << 'EOF'
+      {
+        "name": "webship/webshare-phpstan-tools",
+        "description": "Throwaway PHPStan toolchain for the self-contained PHPStan CI job. Not shipped, not autoloaded by the module.",
+        "type": "project",
+        "require-dev": {
+          "phpstan/phpstan": "^2.2",
+          "drupal/core": "~11.4.0",
+          "symfony/filesystem": "^7.0",
+          "symfony/finder": "^7.0"
+        },
+        "config": {
+          "allow-plugins": false
+        },
+        "minimum-stability": "dev",
+        "prefer-stable": true
+      }
+      EOF
+    - composer update --working-dir=.phpstan-tools --no-interaction --no-progress --ignore-platform-reqs
+  script:
+    # 1G: `scanDirectories` pulls in core's lib + four core modules for symbol
+    # resolution, which does not fit PHP's default 128M.
+    - php .phpstan-tools/vendor/bin/phpstan analyze . --autoload-file="$CI_PROJECT_DIR/.phpstan-tools/vendor/autoload.php" --no-progress --memory-limit=1G
+  allow_failure: false
 
 # = Reusable before_script fragments (via !reference) =
 .fragments:

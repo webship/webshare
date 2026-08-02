@@ -5,6 +5,9 @@ yarn-error.log
 ADMIN_GUIDE.md
 .eslintcache
 
+# Throwaway toolchain the self-contained "🔬 PHPStan" CI job installs at runtime.
+.phpstan-tools/
+
 # Test runtime artefacts. The directories themselves are tracked so the
 # layout (per-flavour subfolders + READMEs) is reproducible after a clean
 # checkout; only the generated files inside them are ignored.
