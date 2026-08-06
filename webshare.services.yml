@@ -1,4 +1,7 @@
 services:
+  webshare.platform_manager:
+    class: Drupal\webshare\PlatformManager
+    arguments: ['@database', '@datetime.time']
   webshare.service:
     class: Drupal\webshare\WebshareService
     factory: ['Drupal\webshare\WebshareService', 'create']

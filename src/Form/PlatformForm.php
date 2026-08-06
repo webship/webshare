@@ -15,6 +15,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
+use Drupal\webshare\PlatformManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -51,6 +52,13 @@ class PlatformForm extends FormBase {
   protected $time;
 
   /**
+   * The platform manager service.
+   *
+   * @var \Drupal\webshare\PlatformManager
+   */
+  protected $platformManager;
+
+  /**
    * Constructs a new PlatformForm object.
    *
    * @param \Drupal\Core\Database\Connection $database
@@ -61,12 +69,15 @@ class PlatformForm extends FormBase {
    *   The module extension list service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\webshare\PlatformManager $platform_manager
+   *   The platform manager service.
    */
-  public function __construct(Connection $database, FileSystemInterface $file_system, ModuleExtensionList $module_extension_list, TimeInterface $time) {
+  public function __construct(Connection $database, FileSystemInterface $file_system, ModuleExtensionList $module_extension_list, TimeInterface $time, PlatformManager $platform_manager) {
     $this->database = $database;
     $this->fileSystem = $file_system;
     $this->moduleExtensionList = $module_extension_list;
     $this->time = $time;
+    $this->platformManager = $platform_manager;
   }
 
   /**
@@ -77,7 +88,8 @@ class PlatformForm extends FormBase {
         $container->get('database'),
         $container->get('file_system'),
         $container->get('extension.list.module'),
-        $container->get('datetime.time')
+        $container->get('datetime.time'),
+        $container->get('webshare.platform_manager')
     );
   }
 
@@ -234,25 +246,20 @@ class PlatformForm extends FormBase {
       $form_state->setError($form['icon'], $this->t('An icon is required for new platforms.'));
     }
 
-    // A non-empty URL template must:
-    //  - use a safe scheme (https://, http://, or mailto:),
-    //  - contain the [url] placeholder so the substitution actually puts the
-    //    current page URL into the share link. An empty template means
-    //    copy-to-clipboard mode (the "Copy URL" platform).
+    // A non-empty URL template must use a safe scheme (https://, http://,
+    // or mailto:). An empty template means copy-to-clipboard mode (the
+    // "Copy URL" platform). The [url]/[title] placeholders are optional,
+    // not required: a template using neither is a legitimate static link
+    // (e.g. a platform with no share-intent URL at all, which always
+    // points at a fixed destination rather than the current page) rather
+    // than a mistake — the substitution is simply a no-op on a template
+    // that doesn't use it.
     $url_template = trim((string) ($values['url_template'] ?? ''));
-    if ($url_template !== '') {
-      if (!preg_match('/^(https?:\/\/|mailto:)/i', $url_template)) {
-        $form_state->setError(
-            $form['url_template'],
-            $this->t('The sharing URL template must start with https://, http:// or mailto:.'),
-        );
-      }
-      if (!str_contains($url_template, '[url]')) {
-        $form_state->setError(
-            $form['url_template'],
-            $this->t('The sharing URL template must include the [url] placeholder; otherwise the current page URL is never inserted into the share link.'),
-        );
-      }
+    if ($url_template !== '' && !preg_match('/^(https?:\/\/|mailto:)/i', $url_template)) {
+      $form_state->setError(
+          $form['url_template'],
+          $this->t('The sharing URL template must start with https://, http:// or mailto:.'),
+      );
     }
   }
 
@@ -290,59 +297,25 @@ class PlatformForm extends FormBase {
       }
     }
 
-    $existing = $this->database
-      ->select('webshare_platforms', 'wp')
-      ->fields('wp')
-      ->condition('platform_id', $platform_id)
-      ->execute()
-      ->fetchObject();
+    $existing = $this->platformManager->loadPlatform($platform_id);
 
-    $time = $this->time->getRequestTime();
-
-    if ($existing) {
-      // Update existing platform
-      $fields = [
-        'name' => $values['name'],
-        'title' => $values['title'],
-        'url_template' => $values['url_template'] ?: '',
-        'enabled' => (int) $values['enabled'],
-        'weight' => (int) $values['weight'],
-        'updated' => $time,
-      ];
-
-      if ($image_path) {
-        $fields['image'] = $image_path;
-      }
-
-      $this->database->update('webshare_platforms')
-        ->fields($fields)
-        ->condition('platform_id', $platform_id)
-        ->execute();
-
-      $this->messenger()->addMessage($this->t('Platform %name has been updated.', ['%name' => $values['name']]));
-    } else {
-      // Insert new platform - validation already handled in validateForm()
-      $this->database->insert('webshare_platforms')
-        ->fields([
-          'platform_id' => $platform_id,
-          'name' => $values['name'],
-          'title' => $values['title'],
-          'url_template' => $values['url_template'] ?: '',
-          'enabled' => (int) $values['enabled'],
-          'image' => $image_path,
-          'weight' => (int) $values['weight'],
-          'is_custom' => 1,
-          'created' => $time,
-          'updated' => $time,
-        ])
-        ->execute();
-
-      $this->messenger()->addMessage($this->t('Platform %name has been added.', ['%name' => $values['name']]));
+    $platform_values = [
+      'platform_id' => $platform_id,
+      'name' => $values['name'],
+      'title' => $values['title'],
+      'url_template' => $values['url_template'] ?: '',
+      'enabled' => (int) $values['enabled'],
+      'weight' => (int) $values['weight'],
+    ];
+    if ($image_path) {
+      $platform_values['image'] = $image_path;
     }
 
-    // Refresh every cached rendering of the share rail (anonymous page cache
-    // included) now that the platform set has changed.
-    \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
+    $this->platformManager->savePlatform($platform_values);
+
+    $this->messenger()->addMessage($existing
+      ? $this->t('Platform %name has been updated.', ['%name' => $values['name']])
+      : $this->t('Platform %name has been added.', ['%name' => $values['name']]));
   }
 
   /**

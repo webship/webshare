@@ -2,10 +2,10 @@
 
 namespace Drupal\webshare\Form;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\webshare\PlatformManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -14,11 +14,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PlatformDeleteForm extends ConfirmFormBase {
 
   /**
-   * The database connection.
+   * The platform manager.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var \Drupal\webshare\PlatformManager
    */
-  protected $database;
+  protected $platformManager;
 
   /**
    * The platform to delete.
@@ -30,11 +30,11 @@ class PlatformDeleteForm extends ConfirmFormBase {
   /**
    * Constructs a new PlatformDeleteForm object.
    *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
+   * @param \Drupal\webshare\PlatformManager $platform_manager
+   *   The platform manager.
    */
-  public function __construct(Connection $database) {
-    $this->database = $database;
+  public function __construct(PlatformManager $platform_manager) {
+    $this->platformManager = $platform_manager;
   }
 
   /**
@@ -42,7 +42,7 @@ class PlatformDeleteForm extends ConfirmFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-        $container->get('database')
+        $container->get('webshare.platform_manager')
     );
   }
 
@@ -58,12 +58,7 @@ class PlatformDeleteForm extends ConfirmFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $platform_id = NULL) {
     if ($platform_id) {
-      $this->platform = $this->database
-        ->select('webshare_platforms', 'wp')
-        ->fields('wp')
-        ->condition('platform_id', $platform_id)
-        ->execute()
-        ->fetchObject();
+      $this->platform = $this->platformManager->loadPlatform($platform_id);
     }
 
     if (!$this->platform) {
@@ -111,18 +106,14 @@ class PlatformDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->database->delete('webshare_platforms')
-      ->condition('platform_id', $this->platform->platform_id)
-      ->execute();
+    // Deletes through the same path as the deleteSocialPlatform config
+    // action, cache invalidation included.
+    $this->platformManager->deletePlatform($this->platform->platform_id);
 
     $this->messenger()->addMessage($this->t(
         'Platform %name has been deleted.',
         ['%name' => $this->platform->name]
     ));
-
-    // Refresh every cached rendering of the share rail (anonymous page cache
-    // included) now that a platform has been removed.
-    \Drupal\Core\Cache\Cache::invalidateTags(['webshare_platforms']);
 
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
