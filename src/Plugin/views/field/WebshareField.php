@@ -3,6 +3,7 @@
 namespace Drupal\webshare\Plugin\views\field;
 
 use Drupal\webshare\WebshareServiceInterface;
+use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,9 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Field handler to display Webshare buttons.
  *
  * @ingroup views_field_handlers
- *
- * @ViewsField("webshare_field")
  */
+#[ViewsField("webshare_field")]
 class WebshareField extends FieldPluginBase
 {
 

@@ -49,7 +49,6 @@ module.exports = {
       'cms-drupal-cms-gin.json',
       'webshare.json',
       'drupal-olivero.json',
-      'drupal-cms-mercury.json',
     ],
     offset: 60,
     breakpoints: {

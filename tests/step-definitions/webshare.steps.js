@@ -169,6 +169,26 @@ async function placeShareBlock(world, theme, id, region) {
     document.querySelector('#edit-actions-submit').click();
   });
   await waitForPageLoad(world.page);
+
+  // Confirm the block actually exists in that theme. Without this the step
+  // passes whatever happens: a wrong theme 404s on the add form, a rejected
+  // save returns the form again, and either way the click and the page load
+  // both succeed. The block layout listing for the theme is the source of
+  // truth - `/admin/structure/block/list/{theme}`, core's
+  // `block.admin_display_theme` route.
+  await gotoUrl(world.page, `${base}/admin/structure/block/list/${theme}`);
+  await waitForPageLoad(world.page);
+  const placed = await world.page
+    .locator(`a[href*="/admin/structure/block/manage/${id}"]`)
+    .count();
+  if (placed === 0) {
+    throw new Error(
+      `The "${id}" block is not listed in the "${theme}" theme after placing it `
+      + `in the "${region}" region. The theme was detected from the first `
+      + '"Place block" link on /admin/structure/block, so it may be the admin '
+      + 'theme rather than the front-end one.',
+    );
+  }
 }
 
 /**
@@ -192,25 +212,6 @@ Given(/^the Webshare Share blocks are placed in the content regions$/, async fun
   }, 'Could not place the Webshare Share blocks in the content regions');
 });
 
-/**
- * Place the Share block in the Header and Footer regions of the default
- * theme. This is the Drupal CMS variant - the Mercury theme (Drupal CMS
- * 2.x default) exposes only content / header / footer regions, and the
- * `content` region is owned by Canvas-driven page content. The blocks get
- * the deterministic ids `webshare_header` and `webshare_footer`, exposed
- * in the DOM as `#block-webshare-header` / `#block-webshare-footer`.
- * Idempotent. Must be invoked while logged in as the Webmaster.
- *
- * Example #1: Given the Webshare Share blocks are placed in the header and footer regions
- * Example #2: And the Webshare Share blocks are placed in the header and footer regions
- */
-Given(/^the Webshare Share blocks are placed in the header and footer regions$/, async function () {
-  await attempt(async () => {
-    const theme = await detectTheme(this);
-    await placeShareBlock(this, theme, 'webshare_header', 'header');
-    await placeShareBlock(this, theme, 'webshare_footer', 'footer');
-  }, 'Could not place the Webshare Share blocks in the header and footer regions');
-});
 
 /**
  * Set the enabled Webshare platforms through the settings form.

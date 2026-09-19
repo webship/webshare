@@ -5,6 +5,5 @@ webship-js records a Playwright `.webm` for each scenario in
 Passing scenarios discard their recording; failing scenarios keep it.
 
 - `drupal/` — Drupal Standard captures.
-- `drupalcms/` — Drupal CMS captures.
 
 `.webm` files are gitignored; the folders + READMEs are tracked.

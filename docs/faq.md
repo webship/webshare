@@ -24,11 +24,11 @@ still usable via the classic block plugin and custom Twig.
 
 ### Does Webshare work on Drupal CMS?
 
-Yes - Webshare is tested against the `drupal/cms` distribution
-(Mercury theme) on every push. Because Mercury delegates header /
-footer rendering to Canvas's `page_region` entities, the rail on
-Drupal CMS is placed by adding `sdc.webshare.share` to those
-page_regions instead of using classic block placement. The
+Yes. Because Mercury delegates header / footer rendering to Canvas's
+`page_region` entities, the rail on Drupal CMS is placed by adding
+`sdc.webshare.share` to those page_regions instead of using classic
+block placement. This is not covered by the automated suite, which
+runs against the Drupal Standard profile. The
 [admin Canvas guide](2-admins/3-canvas-integration.md) and the
 [developer integration guide](3-developers/4-canvas-integration.md)
 both cover this.
@@ -157,10 +157,9 @@ actually registered.
 ### How do I run the tests locally?
 
 You need a DDEV test site with the module installed. See
-[Testing](3-developers/5-testing.md#running-the-suite-locally). Two
-parallel sites exist on the development machine -
-`drupal11webshare` (Standard) and `drupalcms2webshare` (Drupal CMS) -
-plus the suite is also runnable inside the canonical module repo.
+[Testing](3-developers/5-testing.md#running-the-suite-locally). A
+`drupal11webshare` (Standard) site exists on the development machine,
+and the suite is also runnable inside the canonical module repo.
 
 ### Are the tests pure browser-driven?
 

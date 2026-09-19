@@ -3,9 +3,7 @@
 #
 # Validation jobs (cspell / eslint / stylelint) plus three webship-js BDD
 # browser-test jobs:
-#   - webship-js-test                → Drupal Standard profile
-#   - webship-js-test-drupal-cms     → Drupal CMS distribution
-#   - webship-js-test-canvas         → Drupal Standard + Drupal Canvas
+#   - webship-js-drupal-core-11                → Drupal Standard profile
 #
 # The webship-js suite drives the site entirely through the browser. The
 # first feature (01-01-01-users-login) logs in as the Webmaster, places the
@@ -193,8 +191,11 @@ phpstan:
 # with Drupal Canvas enabled (Canvas ships in the module's require-dev so
 # every job in this pipeline has it available). Includes the Canvas page +
 # content_template + blog node seeding for the @canvas scenarios.
-webship-js-test:
+webship-js-drupal-core-11:
   extends: .drupal-node-base
+  variables:
+    # Drupal core 11 is tested on PHP 8.4.
+    _TARGET_PHP: "8.4"
   before_script:
     - !reference [.fragments, web_db]
     - $CI_PROJECT_DIR/vendor/bin/drush --root=$CI_PROJECT_DIR/$_WEB_ROOT site:install standard
@@ -287,22 +288,33 @@ webship-js-test:
         --pdf-out tests/reports/drupal/cucumber_report.pdf
   allow_failure: false
 
-# = webship-js BDD - Drupal CMS distribution =
+# = webship-js BDD - Drupal 12 =
 #
-# Runs the `tests/features/drupalcms/` suite on a Drupal CMS distribution
-# (drupal/cms) installed with the `drupal_cms_installer` profile, not the
-# Standard profile.
+# Proves the module works on Drupal 12, which the 2.0.x branch now allows.
+# Built against the 12.0.0-alpha1 release: Packagist publishes no 12.0.0-alpha1
+# branch for drupal/core, so an exact dev constraint cannot resolve.
 #
-# This job does NOT extend `.drupal-node-base` - drupalci's prebuilt
-# `composer` artefact pins `cweagans/composer-patches` to ~1.0, which
-# conflicts with drupal/cms ≥2.1 (requires ^2). Instead the job runs
-# `composer create-project drupal/cms` from scratch into a sibling
-# directory, then adds the local webshare module path.
+# Drush 14 is required, as a dev branch: Drupal 12 needs symfony/yaml ~v8.1,
+# and stable Drush stops at 13.8.0, which pins symfony ^6 || ^7. Only
+# drush 14.x-dev allows symfony ^8.
+# (`^11.4 || ^12`). The three jobs above keep testing the supported core; this
+# one is additive, so a Drupal 12 regression is visible without changing what
+# they cover.
 #
-# The Drupal CMS installer ignores `--account-name` / `--account-pass`,
-# so uid 1 is renamed post-install to `webmaster` with the password the
-# shared cucumber `users` registry expects.
-webship-js-test-drupal-cms:
+# This job does NOT extend `.drupal-node-base`: drupalci's
+# prebuilt `composer` artefact resolves the supported core, and no variable
+# override can turn that into Drupal 12. The job builds its own project
+# instead.
+#
+# `options.versions` pins the path package explicitly: an MR pipeline checks
+# out a detached merge
+# commit, so Composer would otherwise resolve the local checkout as
+# `dev-<sha>`, which does not satisfy the `2.0.x-dev@dev` constraint.
+#
+# The `@canvas` scenarios are excluded. They need drupal/canvas, whose Drupal
+# 12 support is its own dependency question; a failure there would say nothing
+# about webshare. Everything else in the Drupal suite runs.
+webship-js-drupal-core-12:
   extends: .testing-job-base
   needs: []
   services:
@@ -314,7 +326,9 @@ webship-js-test-drupal-cms:
     DRUPAL_TEST_BASE_URL: "http://localhost"
     LAUNCH_URL: "http://localhost"
     FORCE_COLOR: "1"
-    _CMS_BUILD_DIR: "/tmp/cms-build"
+    # Drupal 12 is tested on PHP 8.5.
+    _TARGET_PHP: "8.5"
+    _D12_BUILD_DIR: "/tmp/d12-build"
   artifacts:
     when: always
     paths:
@@ -325,89 +339,82 @@ webship-js-test-drupal-cms:
     reports:
       junit: tests/reports/junit.xml
   before_script:
-    # = Build a fresh Drupal CMS project (does not collide with drupalci) =
-    - composer create-project drupal/cms $_CMS_BUILD_DIR --no-interaction --no-progress
-    # = Add the local webshare module as a `path` repository + require it =
-    # drupal/cms ships `minimum-stability: stable`; the local checkout is the
-    # `2.0.x-dev` branch, so require it with explicit `@dev` stability and
-    # relax the project's own minimum-stability so the path-repo dev version
-    # is acceptable. `prefer-stable` stays true so only this one package
-    # picks up the dev release.
-    - cd $_CMS_BUILD_DIR
+    # = Build a Drupal 12 project =
+    - composer create-project drupal/recommended-project:12.0.0-alpha1 $_D12_BUILD_DIR --no-interaction --no-progress --no-install --stability alpha
+    - cd $_D12_BUILD_DIR
+    # dev, not alpha: drush 14.x-dev needs grasmash/yaml-cli 4.x-dev, which has
+    # no stable or alpha release. prefer-stable keeps the rest on stable.
     - composer config minimum-stability dev
     - composer config prefer-stable true
-    # `options.versions` pins the path package's resolved version explicitly.
-    # Without it, Composer guesses the version from the git working copy's
-    # branch name - but an MR pipeline checks out a detached merge commit, so
-    # there is no branch name and Composer falls back to `dev-<sha>`. That
-    # package name does not satisfy the `2.0.x-dev@dev` constraint below, and
-    # because path repos are canonical, the composer repo's real `dev-2.0.x`
-    # is discarded too - failing every MR pipeline regardless of the diff.
-    # https://getcomposer.org/doc/05-repositories.md#path
+    - composer config --no-plugins allow-plugins.drupal/core-composer-scaffold true
+    - composer config --no-plugins allow-plugins.drupal/core-project-message true
+    - composer config --no-plugins allow-plugins.drupal/core-recipe-unpack true
+    - composer config --no-plugins allow-plugins.drupal/core-vendor-hardening true
+    - composer config --no-plugins allow-plugins.composer/installers true
+    - composer require "drupal/core-recommended:12.0.0-alpha1" "drupal/core-composer-scaffold:12.0.0-alpha1" "drush/drush:^14@dev" --no-interaction --no-progress --update-with-all-dependencies
+    # = Add the local webshare checkout as a path repository =
     - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true,"versions":{"drupal/webshare":"2.0.x-dev"}}}'
     - composer require 'drupal/webshare:2.0.x-dev@dev' --no-interaction --no-progress
+    # = Show what was actually resolved, so a future failure is diagnosable =
+    - composer show drupal/core --no-interaction | head -3
     # = Web server =
-    - mkdir -pv $_CMS_BUILD_DIR/web/sites/default/files
-    - mkdir -pv $_CMS_BUILD_DIR/web/sites/simpletest
-    - chmod -R 777 $_CMS_BUILD_DIR/web/sites/default/files
-    - chmod -R 777 $_CMS_BUILD_DIR/web/sites/simpletest
-    - rm -rf /var/www/html && ln -s $_CMS_BUILD_DIR/web /var/www/html
-    - chown -R www-data:www-data $_CMS_BUILD_DIR
+    - mkdir -pv $_D12_BUILD_DIR/web/sites/default/files
+    - mkdir -pv $_D12_BUILD_DIR/web/sites/simpletest
+    - chmod -R 777 $_D12_BUILD_DIR/web/sites/default/files
+    - chmod -R 777 $_D12_BUILD_DIR/web/sites/simpletest
+    - rm -rf /var/www/html && ln -s $_D12_BUILD_DIR/web /var/www/html
+    - chown -R www-data:www-data $_D12_BUILD_DIR
     - service apache2 start
     - export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE
-    # = Drupal CMS site install =
-    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web site:install drupal_cms_installer
-        --db-url=$SIMPLETEST_DB --site-name="Webshare Drupal CMS Test" -y
-    # = Rename uid 1 to webmaster =
-    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web php:eval '$u=\Drupal\user\Entity\User::load(1); $u->setUsername("webmaster"); $u->setEmail("webmaster@example.test"); $u->setPassword("dD.123123ddd"); $u->save();'
-    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web en webshare -y
-    # = Seed the Mercury header + footer Canvas page_region entities =
+    # = Install and enable =
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web site:install standard
+        --db-url=$SIMPLETEST_DB --account-name=webmaster --account-pass=dD.123123ddd
+        --site-name="Webshare Drupal 12 Test" -y
+    # Drupal 12 Standard installs Claro as the DEFAULT theme, not Olivero
+    # (core/profiles/standard/config/install/system.theme.yml). Claro is an
+    # admin theme with no content_above / content_below regions, so the block
+    # placement the suite performs would land nowhere and the front page would
+    # render no share rail. Give this job the same front end the Drupal 11 job
+    # gets by default.
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web theme:enable olivero -y
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web config:set system.theme default olivero -y
+    # Drupal 12 Standard points the front page at /admin/welcome, which
+    # answers 403 to anonymous users, and installs no content types at all,
+    # so the browser tests had nothing to load. Apply the test fixture
+    # recipe: it creates the Basic page type, publishes one node at
+    # /webshare-test-front, and points the front page at it.
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web recipe $CI_PROJECT_DIR/tests/fixtures/front_page
+    # The theme change is config: without a rebuild the running site keeps
+    # serving the front page in the old theme, which is what the captured
+    # failure page showed - Claro CSS on the front page while the blocks had
+    # been placed for Olivero.
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web cache:rebuild
+    # Prove which theme the site will actually render with.
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web config:get system.theme
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web en webshare -y
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web status --fields=drupal-version,install-profile
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web cache:rebuild
+    # The suite places blocks through the admin UI and reports the step as
+    # passed whether or not a block entity is created. Prove the plugin is
+    # discoverable here, after the module is enabled and the cache rebuilt, so
+    # a missing plugin is told apart from markup that fails to render.
     - |
-      $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web php:eval '
-        $component = \Drupal::entityTypeManager()->getStorage("component")->load("sdc.webshare.share");
-        if (!$component) { return; }
-        $version = $component->getActiveVersion();
-        $regions = [
-          "header" => "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
-          "footer" => "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
-        ];
-        foreach ($regions as $region => $uuid) {
-          $page_region = \Drupal::entityTypeManager()->getStorage("page_region")->load("mercury.$region");
-          if (!$page_region) { continue; }
-          $tree = $page_region->get("component_tree");
-          $tree[$uuid] = [
-            "uuid" => $uuid,
-            "component_id" => "sdc.webshare.share",
-            "component_version" => $version,
-            "inputs" => [
-              "heading" => $region === "footer" ? "Share this page" : "Share",
-              "display_title" => $region === "footer",
-              "alignment" => $region === "footer" ? "start" : "end",
-              "orientation" => "horizontal",
-              "mobile_visibility" => "all",
-              "native_share" => TRUE,
-              "placement" => "inline",
-              "share_title" => "",
-              "share_text" => "",
-            ],
-          ];
-          $page_region->set("component_tree", $tree)->save();
-        }
+      $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web php:eval '
+        $defs = \Drupal::service("plugin.manager.block")->getDefinitions();
+        print isset($defs["share"])
+          ? "probe: share block plugin FOUND" . PHP_EOL
+          : "probe: share block plugin MISSING. first ids: " . implode(", ", array_slice(array_keys($defs), 0, 30)) . PHP_EOL;
       '
-    - $_CMS_BUILD_DIR/vendor/bin/drush --root=$_CMS_BUILD_DIR/web cache:rebuild
-    # = Node.js 20 + Playwright Chromium (from CI_PROJECT_DIR - features live there) =
+    # = Node.js 20 + Playwright Chromium (features live in CI_PROJECT_DIR) =
     - cd $CI_PROJECT_DIR
     - !reference [.fragments, node_playwright]
   script:
-    # cucumber.drupalcms.js loads only `tests/features/drupalcms/**`. Disable
-    # the auto HTML hook and run `generate-reports` explicitly so HTML + PDF
-    # both land next to the JSON in `tests/reports/drupalcms/`.
-    - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.drupalcms.js --tags "not @wip"
+    - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip and not @canvas"
     - node ./node_modules/webship-js/bin/generate-reports.js
-        --json tests/reports/drupalcms/cucumber_report.json
-        --out  tests/reports/drupalcms/cucumber_report.html
+        --json tests/reports/drupal/cucumber_report.json
+        --out  tests/reports/drupal/cucumber_report.html
         --format all
-        --pdf-out tests/reports/drupalcms/cucumber_report.pdf
+        --pdf-out tests/reports/drupal/cucumber_report.pdf
   allow_failure: false
 
 # = GitLab Pages - MkDocs documentation site =

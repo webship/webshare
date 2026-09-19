@@ -1,39 +1,32 @@
 # Testing
 
-Webshare ships a comprehensive webship-js BDD suite (Playwright +
-Cucumber) that runs against two Drupal flavours:
+Webshare ships a webship-js BDD suite (Playwright + Cucumber) that runs
+against the Drupal Standard profile:
 
 | Flavour          | Profile                      | Theme    | Feature folder                       | Config                     |
 | ---------------- | ---------------------------- | -------- | ------------------------------------ | -------------------------- |
 | Drupal Standard  | `standard` (Olivero theme)   | Olivero  | `tests/features/drupal/`             | `cucumber.js`              |
-| Drupal CMS       | `drupal_cms_installer`       | Mercury  | `tests/features/drupalcms/`          | `cucumber.drupalcms.js`    |
 
-Combined: **82 scenarios / 472 steps** at the time of writing, all
-passing.
+**53 scenarios / 310 steps** at the time of writing, all passing.
 
 ## Running the Suite Locally
 
-Each flavour has a sibling DDEV test site under
+There is a sibling DDEV test site under
 `/var/www/html/test/`. Inside that site:
 
 ```bash
 # Drupal Standard
 LAUNCH_URL="http://drupal11webshare.ddev.site:<port>" \
   npx cucumber-js --config cucumber.js
-
-# Drupal CMS
-LAUNCH_URL="http://drupalcms2webshare.ddev.site:<port>" \
-  npx cucumber-js --config cucumber.drupalcms.js
 ```
 
 The configs are committed in the module repo (`cucumber.js`,
-`cucumber.drupalcms.js`, `cucumber.shared.js`) and route artefacts
-into per-flavour subfolders:
+`cucumber.shared.js`) and route artefacts into subfolders:
 
 ```
-tests/reports/{drupal,drupalcms}/
-tests/screenshots/{drupal,drupalcms}/
-tests/videos/{drupal,drupalcms}/
+tests/reports/drupal/
+tests/screenshots/drupal/
+tests/videos/drupal/
 ```
 
 ## Suite Layout
@@ -41,17 +34,15 @@ tests/videos/{drupal,drupalcms}/
 ```
 tests/
 ├── features/
-│   ├── drupal/        # 11 .feature files - Standard / Olivero
-│   └── drupalcms/     # 5 .feature files - Drupal CMS / Mercury
+│   └── drupal/        # 11 .feature files - Standard / Olivero
 ├── selectors/
 │   ├── webshare.json              # Shared component selectors
 │   ├── drupal-olivero.json        # Above/Below block selectors
-│   ├── drupal-cms-mercury.json    # Header/Footer Canvas selectors
 │   ├── cms-drupal-core-claro.json # Sibling-shared Claro admin
 │   └── cms-drupal-cms-gin.json    # Sibling-shared Gin admin
 ├── step-definitions/
 │   └── webshare.steps.js          # Custom steps - pure browser only
-├── reports/, screenshots/, videos/  # Per-flavour run output dirs
+├── reports/, screenshots/, videos/  # Run output dirs
 └── README.md
 ```
 
@@ -68,7 +59,6 @@ handled by the CI `before_script`, not by Cucumber steps.
 | `Given I am a logged in user with the "<role>" user`                              | Logs in via the `users` registry in `cucumber.shared.js` |
 | `Given I add testing users`                                                       | Provisions one user per Standard role via /admin/people/create |
 | `Given the Webshare Share blocks are placed in the content regions`               | Places `webshare_above` + `webshare_below` blocks (Olivero) |
-| `Given the Webshare Share blocks are placed in the header and footer regions`    | Drupal CMS placement variant (Mercury page_regions are seeded by CI) |
 | `Given I enable all Webshare platforms`                                           | Toggles every platform on via the settings form          |
 | `Given I enable only the default Webshare platforms`                              | Resets to `linkedin`, `facebook_share`, `x`              |
 | `Given I enable the Webshare platform "<id>"`                                    | Enables one named platform on top of the defaults        |
@@ -104,15 +94,20 @@ appears in scenario lines.
 
 `.gitlab-ci.yml` defines two browser-test jobs:
 
-| Job                              | Profile      | Modules                          | Features                       |
-| -------------------------------- | ------------ | -------------------------------- | ------------------------------ |
-| `webship-js-test`                | Standard     | `webshare`, `canvas`             | `tests/features/drupal/`       |
-| `webship-js-test-drupal-cms`    | Drupal CMS   | `webshare` (Canvas via drupal/cms) | `tests/features/drupalcms/`  |
+| Job                          | Core        | Modules              | Features                 |
+| ---------------------------- | ----------- | -------------------- | ------------------------ |
+| `webship-js-drupal-core-11`  | 11.4        | `webshare`, `canvas` | `tests/features/drupal/` |
+| `webship-js-drupal-core-12`  | 12.0-alpha1 | `webshare`           | `tests/features/drupal/` |
 
-Both jobs use the drupalci `composer` artefact for the Drupal codebase,
-install with drush, seed Canvas / page_region fixtures via `drush php:eval`
-in `before_script`, install Node 20 + Playwright Chromium, then run
-the cucumber-js suite.
+Both install the Standard profile with drush, install Node 20 + Playwright
+Chromium, then run the cucumber-js suite.
+
+The Drupal 11 job enables Drupal Canvas and seeds the Canvas page,
+content_template and blog node the `@canvas` scenarios need. The Drupal 12
+job skips `@canvas` - Canvas's own Drupal 12 support is a separate question -
+and builds its front page from the recipe in `tests/fixtures/front_page`,
+because Drupal 12's Standard profile points the front page at
+`/admin/welcome` and installs no content types.
 
 Plus three validate-stage jobs (cspell / eslint / stylelint) that also
 run locally through `npx gitlab-ci-local --file .gitlab-ci-local.yml`.
@@ -120,7 +115,7 @@ run locally through `npx gitlab-ci-local --file .gitlab-ci-local.yml`.
 ## Adding a Scenario
 
 1. Edit or create the relevant `.feature` file under
-   `tests/features/drupal/` or `tests/features/drupalcms/`.
+   `tests/features/drupal/`.
 2. Use only **named selectors** in `Then the "<name>" element …`
    assertions. If the selector you need doesn't exist, add it to the
    appropriate JSON file under `tests/selectors/` first.

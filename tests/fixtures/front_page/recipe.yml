@@ -1,0 +1,15 @@
+name: 'Webshare test front page'
+description: 'Gives a test site a front page that anonymous visitors can see. Drupal 12 Standard points the front page at /admin/welcome, which answers 403 to anonymous users, and installs no content types at all, so there is nothing for the browser tests to load.'
+type: 'Content type'
+install:
+  - node
+  - path
+config:
+  import:
+    node:
+      - core.entity_view_mode.node.teaser
+  actions:
+    system.site:
+      simpleConfigUpdate:
+        page:
+          front: /webshare-test-front

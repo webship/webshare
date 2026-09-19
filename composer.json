@@ -15,7 +15,7 @@
       "source": "http://cgit.drupalcode.org/webshare"
     },
     "require": {
-        "drupal/core": "^10 || ^11"
+        "drupal/core": "^11.4 || ^12"
     },
     "require-dev": {
         "drupal/canvas": "^1.4"

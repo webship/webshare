@@ -2,9 +2,11 @@
 
 namespace Drupal\webshare\Plugin\Block;
 
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\path_alias\AliasManagerInterface;
 use Drupal\webshare\WebshareServiceInterface;
@@ -12,12 +14,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Webshare' Block.
- *
- * @Block(
- *   id = "share",
- *   admin_label = @Translation("Share"),
- * )
  */
+#[Block(
+    id: 'share',
+    admin_label: new TranslatableMarkup('Share'),
+)]
 class WebshareBlock extends BlockBase implements ContainerFactoryPluginInterface
 {
 

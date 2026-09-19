@@ -1,14 +1,6 @@
-// Default cucumber-js config - runs the Drupal Standard suite.
+// cucumber-js config for the Webshare suite.
 //
-// The Webshare feature set is split by Drupal flavour:
-//   tests/features/drupal/      - Drupal Standard profile (Olivero theme)
-//   tests/features/drupalcms/   - Drupal CMS distribution (Mercury theme)
-//
-// This config loads only the `drupal/` features. The Drupal CMS suite lives
-// in `cucumber.drupalcms.js`:
-//
-//   npx cucumber-js --config cucumber.js              # Drupal Standard (default)
-//   npx cucumber-js --config cucumber.drupalcms.js    # Drupal CMS
+//   npx cucumber-js --config cucumber.js
 
 const baseWorldParameters = require('./cucumber.shared.js');
 
