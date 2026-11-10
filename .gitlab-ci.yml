@@ -33,6 +33,12 @@ composer:
     DRUPAL_CORE: $CORE_SUPPORTED
     IGNORE_PROJECT_DRUPAL_CORE_VERSION: 0
 
+.composer-base:
+  variables:
+    # Drupal core's own Yarn 4.9.1 would read the project .yarnrc.yml (Yarn >= 4.14 keys) too.
+    YARN_RC_FILENAME: .yarnrc.core.yml
+    YARN_NODE_LINKER: node-modules
+
 # = Validate stage =
 cspell:
   stage: validate
