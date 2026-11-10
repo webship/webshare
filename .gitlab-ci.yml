@@ -36,7 +36,7 @@ composer:
 # = Validate stage =
 cspell:
   stage: validate
-  image: node:20
+  image: node:24
   before_script:
     - npm install -g cspell
   script:
@@ -46,7 +46,7 @@ cspell:
 # Node 20+ required: webship-js >=2.0 declares engines.node ">=20".
 eslint:
   stage: validate
-  image: node:20
+  image: node:24
   before_script:
     - corepack enable
     - yarn install
@@ -59,7 +59,7 @@ eslint:
 
 stylelint:
   stage: validate
-  image: node:20
+  image: node:24
   before_script:
     - corepack enable
     - yarn install
@@ -149,7 +149,7 @@ phpstan:
     - service apache2 start
     - export SIMPLETEST_DB=mysql://$MYSQL_USER:$MYSQL_PASSWORD@database/$MYSQL_DATABASE
   node_playwright: &node_playwright
-    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     - apt-get install -y nodejs
     - node --version && npm --version
     - 'test -f .yarnrc.yml || echo "nodeLinker: node-modules" > .yarnrc.yml'
@@ -280,6 +280,7 @@ webship-js-drupal-core-11:
     # auto HTML hook (it cannot await PDF generation from `process.on('exit')`)
     # and run `generate-reports` explicitly after cucumber-js so both HTML and
     # PDF land next to the JSON in `tests/reports/drupal/`.
+    - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.js --dry-run
     - WEBSHIP_REPORT_DISABLE=1 ./node_modules/.bin/cucumber-js --config cucumber.js --tags "not @wip"
     - node ./node_modules/webship-js/bin/generate-reports.js
         --json tests/reports/drupal/cucumber_report.json

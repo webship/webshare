@@ -10,6 +10,8 @@ module.exports = {
     requireModule: ['tsx/cjs'],
     require: [
       'node_modules/webship-js/tests/step-definitions/**/*.js',
+      'node_modules/@webship-js/drupal-core-steps/tests/step-definitions/**/*.js', // @webship-js/drupal-core-steps: login by handle, the testing users, named pages, messages, listings, the editor, the media library, access control, site structure.
+      'node_modules/@webship-js/drupal-cms-steps/tests/step-definitions/**/*.js',  // @webship-js/drupal-cms-steps: the dashboard, site templates, the cookie consent, Drupal Canvas.
       'tests/step-definitions/**/*.js',
     ],
     paths: ['tests/features/drupal/**/*.feature'],

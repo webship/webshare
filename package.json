@@ -4,8 +4,8 @@
   "license": "GPL-2.0-or-later",
   "private": true,
   "engines": {
-    "yarn": ">= 4.1.1",
-    "node": ">= 20.0"
+    "yarn": ">= 4.18.1",
+    "node": ">= 24.0"
   },
   "scripts": {
     "theme:build": "yarn theme:build:admin",
@@ -19,9 +19,12 @@
     "test:chromium": "BROWSER=chromium cucumber-js --config cucumber.js",
     "test:firefox": "BROWSER=firefox cucumber-js --config cucumber.js",
     "test:webkit": "BROWSER=webkit cucumber-js --config cucumber.js",
-    "generate-reports": "generate-reports"
+    "generate-reports": "generate-reports",
+    "test:dry": "cucumber-js --config cucumber.js --dry-run"
   },
   "devDependencies": {
+    "@webship-js/drupal-cms-steps": "^2.1.0",
+    "@webship-js/drupal-core-steps": "^2.1.0",
     "chalk": "^5.3.0",
     "chokidar": "^3.6.0",
     "eslint": "^8.57.0",
@@ -44,7 +47,8 @@
     "prettier": "^3.2.0",
     "stylelint": "^16.2.0",
     "stylelint-config-standard": "^36.0.0",
-    "stylelint-order": "^6.0.0"
+    "stylelint-order": "^6.0.0",
+    "webship-js": "^2.0.6"
   },
   "browserslist": [
     "last 2 Chrome major versions",
@@ -55,7 +59,7 @@
     "iOS >= 12",
     "Android >= 6"
   ],
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.18.1",
   "keywords": [
     "drupal",
     "drupal-module",
@@ -65,5 +69,8 @@
   ],
   "dependencies": {
     "webship-js": "~2.0.5"
+  },
+  "resolutions": {
+    "@cucumber/cucumber": "10.0.1"
   }
 }
