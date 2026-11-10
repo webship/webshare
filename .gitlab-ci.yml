@@ -352,6 +352,12 @@ webship-js-drupal-core-12:
     - composer config --no-plugins allow-plugins.drupal/core-vendor-hardening true
     - composer config --no-plugins allow-plugins.composer/installers true
     - composer require "drupal/core-recommended:12.0.0-alpha1" "drupal/core-composer-scaffold:12.0.0-alpha1" "drush/drush:^14@dev" --no-interaction --no-progress --update-with-all-dependencies
+    # Twig 3.30.0 breaks every page of Drupal 12.0.0-alpha1 (HTTP 500, "TypeError:
+    # Twig\Runtime\EscaperRuntime::escape(): Argument #4 ($autoescape) must be of
+    # type bool, null given"), and the require above now resolves it. 3.29.0 is the
+    # release the last green run used. Remove this pin once Drupal 12 ships a core
+    # that is compatible with Twig 3.30 (#3591916).
+    - composer require "twig/twig:3.29.0" --no-interaction --no-progress --update-with-dependencies
     # = Add the local webshare checkout as a path repository =
     - composer config repositories.webshare-local '{"type":"path","url":"'"$CI_PROJECT_DIR"'","options":{"symlink":true,"versions":{"drupal/webshare":"2.0.x-dev"}}}'
     - composer require 'drupal/webshare:2.0.x-dev@dev' --no-interaction --no-progress
@@ -393,6 +399,11 @@ webship-js-drupal-core-12:
     - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web config:get system.theme
     - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web en webshare -y
     - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web status --fields=drupal-version,install-profile
+    # The Update module reports a security update for the core version this job
+    # builds and shows it as an error message (.messages--error) on administration
+    # pages, which fails the two admin scenarios that expect none. The suite does not
+    # use the Update module (#3591916).
+    - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web pm:uninstall update -y
     - $_D12_BUILD_DIR/vendor/bin/drush --root=$_D12_BUILD_DIR/web cache:rebuild
     # The suite places blocks through the admin UI and reports the step as
     # passed whether or not a block entity is created. Prove the plugin is
